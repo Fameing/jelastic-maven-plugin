@@ -1,25 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<metadata modelVersion="1.1.0">
+<metadata>
   <groupId>com.jelastic</groupId>
   <artifactId>jelastic-maven-plugin</artifactId>
   <version>1.0-SNAPSHOT</version>
   <versioning>
     <snapshot>
-      <timestamp>20110609.165556</timestamp>
-      <buildNumber>1</buildNumber>
+      <timestamp>20110609.194949</timestamp>
+      <buildNumber>2</buildNumber>
     </snapshot>
-    <lastUpdated>20110609165556</lastUpdated>
-    <snapshotVersions>
-      <snapshotVersion>
-        <extension>jar</extension>
-        <value>1.0-20110609.165556-1</value>
-        <updated>20110609165556</updated>
-      </snapshotVersion>
-      <snapshotVersion>
-        <extension>pom</extension>
-        <value>1.0-20110609.165556-1</value>
-        <updated>20110609165556</updated>
-      </snapshotVersion>
-    </snapshotVersions>
+    <lastUpdated>20110609194951</lastUpdated>
   </versioning>
 </metadata>
