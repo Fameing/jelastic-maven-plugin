@@ -228,5 +228,4 @@
             <url>dav:https://jelastic-maven-plugin.googlecode.com/svn/maven/repository-snapshot</url>
         </snapshotRepository>
     </distributionManagement>
-
 </project>
