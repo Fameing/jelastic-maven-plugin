@@ -212,9 +212,9 @@
         <url>https://code.google.com/p/jelastic-maven-plugin/issues/list</url>
     </issueManagement>
     <scm>
-        <connection>scm:svn:https://jelastic-maven-plugin.googlecode.com/svn/tags/jelastic-maven-plugin-1.0</connection>
-        <developerConnection>scm:svn:https://jelastic-maven-plugin.googlecode.com/svn/tags/jelastic-maven-plugin-1.0</developerConnection>
-        <url>https://jelastic-maven-plugin.codegoogle.com/svn/tags/jelastic-maven-plugin-1.0</url>
+        <connection>scm:svn:https://jelastic-maven-plugin.googlecode.com/svn/trunk/</connection>
+        <developerConnection>scm:svn:https://jelastic-maven-plugin.googlecode.com/svn/trunk/</developerConnection>
+        <url>https://jelastic-maven-plugin.googlecode.com/svn/trunk/</url>
     </scm>
     <distributionManagement>
         <repository>
