@@ -283,7 +283,7 @@ public abstract class JelasticMojo extends AbstractMojo {
             }
 
             MultipartEntity multipartEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
-            multipartEntity.addPart("appid", new StringBody(getJelastiсAppid()));
+            //multipartEntity.addPart("appid", new StringBody(getJelastiсAppid()));
             multipartEntity.addPart("fid", new StringBody("123456"));
             multipartEntity.addPart("session", new StringBody(authentication.getSession()));
             multipartEntity.addPart("file", new FileBody(file));
