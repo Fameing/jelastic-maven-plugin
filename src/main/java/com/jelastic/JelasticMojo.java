@@ -6,50 +6,55 @@ package com.jelastic;
  * Time: 10:30 AM
  */
 
-import com.jelastic.model.*;
+
+/**
+ *        http://app.hivext.com/1.0/users/authentication/rest/signin
+ *        http://api.hivext.com/1.0/storage/uploader/rest/upload
+ *        http://app.hivext.com/1.0/data/base/rest/createobject
+ *        http://live.jelastic.com/deploy/DeployArchive
+ */
+
+import com.jelastic.model.Authentication;
+import com.jelastic.model.CreateObject;
+import com.jelastic.model.Deploy;
+import com.jelastic.model.UpLoader;
+import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpOptions;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.entity.FileEntity;
-import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.settings.Proxy;
 import org.codehaus.jackson.map.ObjectMapper;
 
-import java.io.*;
-import java.net.HttpURLConnection;
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-
 
 public abstract class JelasticMojo extends AbstractMojo {
     private String shema = "http";
-    private String hostApp = "app.hivext.com";
-    private String hostApi = "api.hivext.com";
-    private String hostApiDe = "de-hetzner.hivext.com";
-    private String hostLogs = "178.159.250.35";
+    //private String apiHivext = "api.hivext.com";
+    private String apiJelastic = "api.jelastic.com";
+
 
     private int port = -1;
     private String version = "1.0";
@@ -58,9 +63,7 @@ public abstract class JelasticMojo extends AbstractMojo {
     private String urlAuthentication = "/" + version + "/users/authentication/rest/signin";
     private String urlUploader = "/" + version + "/storage/uploader/rest/upload";
     private String urlCreateObject = "/" + version + "/data/base/rest/createobject";
-    private String urlGetLogs = "/JElastic/dev/env/rest/getlogs";
-    //private String urlEval = "/" + version + "/dev/scripting/rest/eval";
-    private String urlEval = "/" + version + "/development/scripting/rest/eval";
+    private String urlDeploy = /*"/" + version + "*/"/deploy/DeployArchive";
     private static ObjectMapper mapper = new ObjectMapper();
 
 
@@ -74,6 +77,14 @@ public abstract class JelasticMojo extends AbstractMojo {
 
     private MavenProject project;
 
+     /**
+     * The Maven session.
+     *
+     * @parameter expression="${session}"
+     * @readonly
+     * @required
+     */
+    private MavenSession mavenSession;
 
     /**
      * System AppID Properties.
@@ -150,20 +161,12 @@ public abstract class JelasticMojo extends AbstractMojo {
         return shema;
     }
 
-    public String getHostApp() {
-        return hostApp;
-    }
+/*    public String getApiHivext() {
+        return apiHivext;
+    }*/
 
-    public String getHostApi() {
-        return hostApi;
-    }
-
-    public String getHostLogs() {
-        return hostLogs;
-    }
-
-    public String getHostApiDe() {
-        return hostApiDe;
+    public String getApiJelastic() {
+        return apiJelastic;
     }
 
     public int getPort() {
@@ -186,21 +189,13 @@ public abstract class JelasticMojo extends AbstractMojo {
         return urlCreateObject;
     }
 
-    public String getUrlGetLogs() {
-        return urlGetLogs;
-    }
-
-    public String getUrlEval() {
-        return urlEval;
+    public String getUrlDeploy() {
+        return urlDeploy;
     }
 
     public String getJelastiсAppid() {
         return jelastiсAppid;
     }
-
-/*    public String getAppid() {
-        return appid;
-    }*/
 
     public String getEmail() {
         return email;
@@ -228,17 +223,26 @@ public abstract class JelasticMojo extends AbstractMojo {
             throw new MojoExecutionException("Packaging is not 'war'");
         }
 
-
+        List<Proxy> proxyList = mavenSession.getSettings().getProxies();
+        HttpHost http_proxy = null;
+        for (Proxy proxy : proxyList) {
+            if (proxy.getProtocol().equals("http") || proxy.isActive()) {
+                http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
+            }
+        }
         Authentication authentication = null;
 
         try {
             DefaultHttpClient httpclient = new DefaultHttpClient();
-
+            if (http_proxy != null) {
+                httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
+            }
+            httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
             List<NameValuePair> qparams = new ArrayList<NameValuePair>();
-            qparams.add(new BasicNameValuePair("appid", getJelastiсAppid()));
+            //qparams.add(new BasicNameValuePair("appid", getJelastiсAppid()));
             qparams.add(new BasicNameValuePair("login", getEmail()));
             qparams.add(new BasicNameValuePair("password", getPassword()));
-            URI uri = URIUtils.createURI(getShema(), getHostApp(), getPort(), getUrlAuthentication(), URLEncodedUtils.format(qparams, "UTF-8"), null);
+            URI uri = URIUtils.createURI(getShema(), getApiJelastic(), getPort(), getUrlAuthentication(), URLEncodedUtils.format(qparams, "UTF-8"), null);
             getLog().debug(uri.toString());
             HttpGet httpGet = new HttpGet(uri);
             ResponseHandler<String> responseHandler = new BasicResponseHandler();
@@ -258,8 +262,19 @@ public abstract class JelasticMojo extends AbstractMojo {
 
     public UpLoader upload(Authentication authentication) throws MojoExecutionException {
         UpLoader upLoader = null;
+        List<Proxy> proxyList = mavenSession.getSettings().getProxies();
+        HttpHost http_proxy = null;
+        for (Proxy proxy : proxyList) {
+            if (proxy.getProtocol().equals("http") || proxy.isActive()) {
+                http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
+            }
+        }
         try {
             DefaultHttpClient httpclient = new DefaultHttpClient();
+            if (http_proxy != null) {
+                httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
+            }
+            httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
             httpclient.setCookieStore(getCookieStore());
 
             File file = new File(getOutputDirectory() + File.separator + getFinalName() + "." + project.getModel().getPackaging());
@@ -274,7 +289,7 @@ public abstract class JelasticMojo extends AbstractMojo {
             multipartEntity.addPart("file", new FileBody(file));
 
 
-            URI uri = URIUtils.createURI(getShema(), getHostApi(), getPort(), getUrlUploader(), null, null);
+            URI uri = URIUtils.createURI(getShema(), getApiJelastic(), getPort(), getUrlUploader(), null, null);
             getLog().debug(uri.toString());
             HttpPost httpPost = new HttpPost(uri);
             httpPost.setEntity(multipartEntity);
@@ -295,19 +310,30 @@ public abstract class JelasticMojo extends AbstractMojo {
 
     public CreateObject createObject(UpLoader upLoader, Authentication authentication) {
         CreateObject createObject = null;
+        List<Proxy> proxyList = mavenSession.getSettings().getProxies();
+        HttpHost http_proxy = null;
+        for (Proxy proxy : proxyList) {
+            if (proxy.getProtocol().equals("http") || proxy.isActive()) {
+                http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
+            }
+        }
         try {
             DefaultHttpClient httpclient = new DefaultHttpClient();
+            if (http_proxy != null) {
+                httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
+            }
+            httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
             httpclient.setCookieStore(getCookieStore());
 
             List<NameValuePair> nameValuePairList = new ArrayList<NameValuePair>();
             nameValuePairList.add(new BasicNameValuePair("charset", "UTF-8"));
-            nameValuePairList.add(new BasicNameValuePair("appid", getJelastiсAppid()));
+            //nameValuePairList.add(new BasicNameValuePair("appid", getJelastiсAppid()));
             nameValuePairList.add(new BasicNameValuePair("session", authentication.getSession()));
             nameValuePairList.add(new BasicNameValuePair("type", "JDeploy"));
             nameValuePairList.add(new BasicNameValuePair("data", "{'name':'" + getFinalName() + "." + project.getModel().getPackaging() + "', 'archive':'" + upLoader.getFile() + "', 'link':0, 'size':" + upLoader.getSize() + ", 'comment':'" + getFinalName() + "." + project.getModel().getPackaging() + "'}"));
 
             UrlEncodedFormEntity entity = new UrlEncodedFormEntity(nameValuePairList, "UTF-8");
-            URI uri = URIUtils.createURI(getShema(), getHostApp(), getPort(), getUrlCreateObject(), null, null);
+            URI uri = URIUtils.createURI(getShema(), getApiJelastic(), getPort(), getUrlCreateObject(), null, null);
             getLog().debug(uri.toString());
             HttpPost httpPost = new HttpPost(uri);
             httpPost.setEntity(entity);
@@ -328,22 +354,28 @@ public abstract class JelasticMojo extends AbstractMojo {
 
     public Deploy deploy(Authentication authentication, UpLoader upLoader, CreateObject createObject) {
         Deploy deploy = null;
-
+        List<Proxy> proxyList = mavenSession.getSettings().getProxies();
+        HttpHost http_proxy = null;
+        for (Proxy proxy : proxyList) {
+            if (proxy.getProtocol().equals("http") || proxy.isActive()) {
+                http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
+            }
+        }
         try {
             DefaultHttpClient httpclient = new DefaultHttpClient();
+            if (http_proxy != null) {
+                httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
+            }
             httpclient.setCookieStore(getCookieStore());
-
             List<NameValuePair> qparams = new ArrayList<NameValuePair>();
             qparams.add(new BasicNameValuePair("charset", "UTF-8"));
-            qparams.add(new BasicNameValuePair("appid", getJelastiсAppid()));
             qparams.add(new BasicNameValuePair("session", authentication.getSession()));
-            qparams.add(new BasicNameValuePair("script", "deploy/DeployArchive"));
             qparams.add(new BasicNameValuePair("archiveUri", upLoader.getFile()));
             qparams.add(new BasicNameValuePair("archiveName", upLoader.getName()));
             qparams.add(new BasicNameValuePair("newContext", getContext()));
             qparams.add(new BasicNameValuePair("domain", getEnvironment()));
 
-            URI uri = URIUtils.createURI(getShema(), getHostApiDe(), getPort(), getUrlEval(), URLEncodedUtils.format(qparams, "UTF-8"), null);
+            URI uri = URIUtils.createURI(getShema(), getApiJelastic(), getPort(), getUrlDeploy(), URLEncodedUtils.format(qparams, "UTF-8"), null);
             getLog().debug(uri.toString());
             HttpGet httpPost = new HttpGet(uri);
             ResponseHandler<String> responseHandler = new BasicResponseHandler();
@@ -360,7 +392,7 @@ public abstract class JelasticMojo extends AbstractMojo {
         return deploy;
     }
 
-    public LogsResponse getJelasticLogs(Authentication authentication) {
+/*    public LogsResponse getJelasticLogs(Authentication authentication) {
         LogsResponse logsResponse = null;
         try {
             DefaultHttpClient httpclient = new DefaultHttpClient();
@@ -388,6 +420,6 @@ public abstract class JelasticMojo extends AbstractMojo {
             getLog().error(e.getMessage(), e);
         }
         return logsResponse;
-    }
+    }*/
 
 }

@@ -30,7 +30,8 @@ public class GetLogsMojo extends JelasticMojo {
             getLog().info("          Session : " + authentication.getSession());
             getLog().info("              Uid : " + authentication.getUid());
             getLog().info("------------------------------------------------------------------------");
-            LogsResponse logsResponse = getJelasticLogs(authentication);
+           //TODO
+            LogsResponse logsResponse = null;//getJelasticLogs(authentication);
             if (logsResponse.getResult() == 0) {
                 getLog().info("         Get logs : SUCCESS");
                 getLog().info("      Lines Count : " + logsResponse.getLinescount());

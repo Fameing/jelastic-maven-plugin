@@ -42,13 +42,13 @@ public class DeployMojo extends JelasticMojo {
                 getLog().info("     Developer ID : " + createObject.getObject().getDeveloper());
                 getLog().info("------------------------------------------------------------------------");
                     Deploy deploy = deploy(authentication,upLoader,createObject);
-                    if (deploy.getResult() == 0) {
+                    if (deploy.getResponse().getResult() == 0) {
                         getLog().info("      Deploy file : SUCCESS");
                         getLog().info("       Deploy log :");
-                        getLog().info(deploy.getResponse().getOut());
+                        getLog().info(deploy.getResponse().getResponses()[0].getOut());
                     } else {
                         getLog().error("          Deploy : FAILED");
-                        getLog().error("           Error : " + deploy.getError());
+                        getLog().error("           Error : " + deploy.getResponse().getError());
                     }
                 }
             } else {
