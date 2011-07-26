@@ -259,14 +259,14 @@
                 <enabled>false</enabled>
             </snapshots>
             <id>central</id>
-            <name>libs-releases</name>
-            <url>http://maven.jelastic.com/libs-releases</url>
+            <name>libs-release</name>
+            <url>http://maven.jelastic.com/libs-release/</url>
         </repository>
         <repository>
             <snapshots/>
             <id>snapshots</id>
-            <name>libs-snapshots</name>
-            <url>http://maven.jelastic.com/libs-snapshots</url>
+            <name>libs-snapshot</name>
+            <url>http://maven.jelastic.com/libs-snapshot/</url>
         </repository>
     </repositories>
     <pluginRepositories>
@@ -275,14 +275,14 @@
                 <enabled>false</enabled>
             </snapshots>
             <id>central</id>
-            <name>plugins-releases</name>
-            <url>http://maven.jelastic.com/plugins-releases</url>
+            <name>plugins-release</name>
+            <url>http://maven.jelastic.com/plugins-release/</url>
         </pluginRepository>
         <pluginRepository>
             <snapshots/>
             <id>snapshots</id>
-            <name>plugins-snapshots</name>
-            <url>http://maven.jelastic.com/plugins-snapshots</url>
+            <name>plugins-snapshot</name>
+            <url>http://maven.jelastic.com/plugins-snapshot/</url>
         </pluginRepository>
     </pluginRepositories>
 </project>
