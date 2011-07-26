@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.jelastic</groupId>
@@ -238,6 +239,7 @@
         <developerConnection>scm:svn:https://jelastic-maven-plugin.googlecode.com/svn/trunk/</developerConnection>
         <url>https://jelastic-maven-plugin.googlecode.com/svn/trunk/</url>
     </scm>
+
     <distributionManagement>
         <repository>
             <id>jelastic.googlecode.releases</id>
@@ -250,4 +252,37 @@
             <url>dav:https://jelastic-maven-plugin.googlecode.com/svn/maven/repository-snapshot</url>
         </snapshotRepository>
     </distributionManagement>
+
+    <repositories>
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>central</id>
+            <name>libs-releases</name>
+            <url>http://maven.jelastic.com/libs-releases</url>
+        </repository>
+        <repository>
+            <snapshots/>
+            <id>snapshots</id>
+            <name>libs-snapshots</name>
+            <url>http://maven.jelastic.com/libs-snapshots</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>central</id>
+            <name>plugins-releases</name>
+            <url>http://maven.jelastic.com/plugins-releases</url>
+        </pluginRepository>
+        <pluginRepository>
+            <snapshots/>
+            <id>snapshots</id>
+            <name>plugins-snapshots</name>
+            <url>http://maven.jelastic.com/plugins-snapshots</url>
+        </pluginRepository>
+    </pluginRepositories>
 </project>
