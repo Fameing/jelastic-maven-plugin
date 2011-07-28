@@ -305,17 +305,17 @@ public abstract class JelasticMojo extends AbstractMojo {
             UrlEncodedFormEntity entity = new UrlEncodedFormEntity(nameValuePairList, "UTF-8");
 
             for (NameValuePair nameValuePair : nameValuePairList) {
-               getLog().info(nameValuePair.getName() + " : " + nameValuePair.getValue());
+               getLog().debug(nameValuePair.getName() + " : " + nameValuePair.getValue());
             }
 
             URI uri = URIUtils.createURI(getShema(), getApiJelastic(), getPort(), getUrlCreateObject(), null, null);
-            getLog().info(uri.toString());
+            getLog().debug(uri.toString());
             HttpPost httpPost = new HttpPost(uri);
             httpPost.setEntity(entity);
 
             ResponseHandler<String> responseHandler = new BasicResponseHandler();
             String responseBody = httpclient.execute(httpPost, responseHandler);
-            getLog().info(responseBody);
+            getLog().debug(responseBody);
             createObject = mapper.readValue(responseBody, CreateObject.class);
         } catch (URISyntaxException e) {
             getLog().error(e.getMessage(), e);
