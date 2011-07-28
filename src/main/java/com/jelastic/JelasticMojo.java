@@ -52,7 +52,6 @@ import java.util.List;
 
 public abstract class JelasticMojo extends AbstractMojo {
     private String shema = "http";
-    //private String apiHivext = "api.hivext.com";
     private String apiJelastic = "api.jelastic.com";
 
 
@@ -62,8 +61,8 @@ public abstract class JelasticMojo extends AbstractMojo {
     private CookieStore cookieStore = null;
     private String urlAuthentication = "/" + version + "/users/authentication/rest/signin";
     private String urlUploader = "/" + version + "/storage/uploader/rest/upload";
-    private String urlCreateObject = "/" + version + "/data/base/rest/createobject";
-    private String urlDeploy = /*"/" + version + "*/"/deploy/DeployArchive";
+    private String urlCreateObject = "/deploy/createobject";
+    private String urlDeploy = "/deploy/DeployArchive";
     private static ObjectMapper mapper = new ObjectMapper();
 
 
@@ -85,24 +84,6 @@ public abstract class JelasticMojo extends AbstractMojo {
      * @required
      */
     private MavenSession mavenSession;
-
-    /**
-     * System AppID Properties.
-     *
-     * @parameter default-value="8129583aae37a4b556d36dbd56abbc68"
-     */
-    private String jelastiсAppid;
-
-
-/*
-  *  *//**
-     * AppID Properties.
-     *
-     * @parameter
-     * @required
-     *//*
-    private String appid;
-    */
 
     /**
      * Email Properties.
@@ -161,10 +142,6 @@ public abstract class JelasticMojo extends AbstractMojo {
         return shema;
     }
 
-/*    public String getApiHivext() {
-        return apiHivext;
-    }*/
-
     public String getApiJelastic() {
         return apiJelastic;
     }
@@ -191,10 +168,6 @@ public abstract class JelasticMojo extends AbstractMojo {
 
     public String getUrlDeploy() {
         return urlDeploy;
-    }
-
-    public String getJelastiсAppid() {
-        return jelastiсAppid;
     }
 
     public String getEmail() {
@@ -239,7 +212,6 @@ public abstract class JelasticMojo extends AbstractMojo {
             }
             httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
             List<NameValuePair> qparams = new ArrayList<NameValuePair>();
-            //qparams.add(new BasicNameValuePair("appid", getJelastiсAppid()));
             qparams.add(new BasicNameValuePair("login", getEmail()));
             qparams.add(new BasicNameValuePair("password", getPassword()));
             URI uri = URIUtils.createURI(getShema(), getApiJelastic(), getPort(), getUrlAuthentication(), URLEncodedUtils.format(qparams, "UTF-8"), null);
@@ -283,7 +255,6 @@ public abstract class JelasticMojo extends AbstractMojo {
             }
 
             MultipartEntity multipartEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
-            //multipartEntity.addPart("appid", new StringBody(getJelastiсAppid()));
             multipartEntity.addPart("fid", new StringBody("123456"));
             multipartEntity.addPart("session", new StringBody(authentication.getSession()));
             multipartEntity.addPart("file", new FileBody(file));
@@ -327,20 +298,24 @@ public abstract class JelasticMojo extends AbstractMojo {
 
             List<NameValuePair> nameValuePairList = new ArrayList<NameValuePair>();
             nameValuePairList.add(new BasicNameValuePair("charset", "UTF-8"));
-            //nameValuePairList.add(new BasicNameValuePair("appid", getJelastiсAppid()));
             nameValuePairList.add(new BasicNameValuePair("session", authentication.getSession()));
             nameValuePairList.add(new BasicNameValuePair("type", "JDeploy"));
             nameValuePairList.add(new BasicNameValuePair("data", "{'name':'" + getFinalName() + "." + project.getModel().getPackaging() + "', 'archive':'" + upLoader.getFile() + "', 'link':0, 'size':" + upLoader.getSize() + ", 'comment':'" + getFinalName() + "." + project.getModel().getPackaging() + "'}"));
 
             UrlEncodedFormEntity entity = new UrlEncodedFormEntity(nameValuePairList, "UTF-8");
+
+            for (NameValuePair nameValuePair : nameValuePairList) {
+               getLog().info(nameValuePair.getName() + " : " + nameValuePair.getValue());
+            }
+
             URI uri = URIUtils.createURI(getShema(), getApiJelastic(), getPort(), getUrlCreateObject(), null, null);
-            getLog().debug(uri.toString());
+            getLog().info(uri.toString());
             HttpPost httpPost = new HttpPost(uri);
             httpPost.setEntity(entity);
 
             ResponseHandler<String> responseHandler = new BasicResponseHandler();
             String responseBody = httpclient.execute(httpPost, responseHandler);
-            getLog().debug(responseBody);
+            getLog().info(responseBody);
             createObject = mapper.readValue(responseBody, CreateObject.class);
         } catch (URISyntaxException e) {
             getLog().error(e.getMessage(), e);
@@ -391,35 +366,4 @@ public abstract class JelasticMojo extends AbstractMojo {
         }
         return deploy;
     }
-
-/*    public LogsResponse getJelasticLogs(Authentication authentication) {
-        LogsResponse logsResponse = null;
-        try {
-            DefaultHttpClient httpclient = new DefaultHttpClient();
-            httpclient.setCookieStore(getCookieStore());
-
-            List<NameValuePair> qparams = new ArrayList<NameValuePair>();
-            qparams.add(new BasicNameValuePair("charset", "UTF-8"));
-            //qparams.add(new BasicNameValuePair("appid", getAppid()));
-            qparams.add(new BasicNameValuePair("session", authentication.getSession()));
-            qparams.add(new BasicNameValuePair("path", "logs"));
-            qparams.add(new BasicNameValuePair("count", "250"));
-
-            URI uri = URIUtils.createURI(getShema(), getHostLogs(), 8080, getUrlGetLogs(), URLEncodedUtils.format(qparams, "UTF-8"), null);
-            getLog().debug(uri.toString());
-            HttpPost httpPost = new HttpPost(uri);
-            ResponseHandler<String> responseHandler = new BasicResponseHandler();
-            String responseBody = httpclient.execute(httpPost, responseHandler);
-            getLog().debug(responseBody);
-            logsResponse = mapper.readValue(responseBody, LogsResponse.class);
-        } catch (URISyntaxException e) {
-            getLog().error(e.getMessage(), e);
-        } catch (ClientProtocolException e) {
-            getLog().error(e.getMessage(), e);
-        } catch (IOException e) {
-            getLog().error(e.getMessage(), e);
-        }
-        return logsResponse;
-    }*/
-
 }

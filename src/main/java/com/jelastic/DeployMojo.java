@@ -38,8 +38,8 @@ public class DeployMojo extends JelasticMojo {
                 CreateObject createObject = createObject(upLoader,authentication);
                 if (createObject.getResult() == 0) {
                 getLog().info("File registration : SUCCESS");
-                getLog().info("  Registration ID : " + createObject.getObject().getId());
-                getLog().info("     Developer ID : " + createObject.getObject().getDeveloper());
+                getLog().info("  Registration ID : " + createObject.getResponse().getObject().getId());
+                getLog().info("     Developer ID : " + createObject.getResponse().getObject().getDeveloper());
                 getLog().info("------------------------------------------------------------------------");
                     Deploy deploy = deploy(authentication,upLoader,createObject);
                     if (deploy.getResponse().getResult() == 0) {

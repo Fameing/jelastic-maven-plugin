@@ -1,26 +1,12 @@
 package com.jelastic.model;
 
-/**
- * User: Igor.Yova@gmail.com
- * Date: 6/9/11
- * Time: 12:31 PM
- */
 public class CreateObject {
-    private int id;
+    private JelasticResponse response;
     private int result;
-    private JelasticObject object;
-    private Debug debug;
     private String error;
+    private Debug debug;
 
     public CreateObject() {
-    }
-
-    public CreateObject(int id, int result, JelasticObject object, Debug debug, String error) {
-        this.id = id;
-        this.result = result;
-        this.object = object;
-        this.debug = debug;
-        this.error = error;
     }
 
     public static class JelasticObject {
@@ -53,12 +39,42 @@ public class CreateObject {
         }
     }
 
-    public int getId() {
-        return id;
+    public static class JelasticResponse {
+        private int id;
+        private int result;
+        private JelasticObject object;
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+        }
+
+        public int getResult() {
+            return result;
+        }
+
+        public void setResult(int result) {
+            this.result = result;
+        }
+
+        public JelasticObject getObject() {
+            return object;
+        }
+
+        public void setObject(JelasticObject object) {
+            this.object = object;
+        }
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public JelasticResponse getResponse() {
+        return response;
+    }
+
+    public void setResponse(JelasticResponse response) {
+        this.response = response;
     }
 
     public int getResult() {
@@ -67,14 +83,6 @@ public class CreateObject {
 
     public void setResult(int result) {
         this.result = result;
-    }
-
-    public JelasticObject getObject() {
-        return object;
-    }
-
-    public void setObject(JelasticObject object) {
-        this.object = object;
     }
 
     public Debug getDebug() {
