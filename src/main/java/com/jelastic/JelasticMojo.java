@@ -14,10 +14,7 @@ package com.jelastic;
  *        http://live.jelastic.com/deploy/DeployArchive
  */
 
-import com.jelastic.model.Authentication;
-import com.jelastic.model.CreateObject;
-import com.jelastic.model.Deploy;
-import com.jelastic.model.UpLoader;
+import com.jelastic.model.*;
 import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -186,16 +183,7 @@ public abstract class JelasticMojo extends AbstractMojo {
         return environment;
     }
 
-    private boolean isValidPackaging() {
-        return project.getModel().getPackaging().equals("war");
-    }
-
     public Authentication authentication() throws MojoExecutionException {
-        boolean validate = isValidPackaging();
-        if (!validate) {
-            throw new MojoExecutionException("Packaging is not 'war'");
-        }
-
         List<Proxy> proxyList = mavenSession.getSettings().getProxies();
         HttpHost http_proxy = null;
         for (Proxy proxy : proxyList) {
