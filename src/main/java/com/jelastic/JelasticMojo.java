@@ -52,6 +52,7 @@ public abstract class JelasticMojo extends AbstractMojo {
     private String apiJelastic = "api.jelastic.com";
 
 
+
     private int port = -1;
     private String version = "1.0";
 
@@ -140,6 +141,9 @@ public abstract class JelasticMojo extends AbstractMojo {
     }
 
     public String getApiJelastic() {
+        if (System.getProperty("jelastic-hoster") != null && System.getProperty("jelastic-hoster").length() > 0) {
+            apiJelastic = System.getProperty("jelastic-hoster");
+        }
         return apiJelastic;
     }
 
