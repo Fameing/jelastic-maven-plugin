@@ -1,9 +1,13 @@
-package org.codehaus.mojo.jelastic;
+package com.jelastic;
 
-import org.codehaus.mojo.jelastic.model.Authentication;
-import org.codehaus.mojo.jelastic.model.LogsResponse;
+import com.jelastic.model.Authentication;
+import com.jelastic.model.LogsResponse;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 /**
  * User: Igor.Yova@gmail.com

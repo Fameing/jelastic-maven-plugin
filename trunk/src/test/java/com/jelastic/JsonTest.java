@@ -1,10 +1,10 @@
-package org.codehaus.mojo.jelastic;
+package com.jelastic;
 
-import org.codehaus.mojo.jelastic.model.Authentication;
-import org.codehaus.mojo.jelastic.model.Deploy;
+import com.jelastic.model.Authentication;
+import com.jelastic.model.CreateObject;
+import com.jelastic.model.Deploy;
+import com.jelastic.model.UpLoader;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.mojo.jelastic.model.CreateObject;
-import org.codehaus.mojo.jelastic.model.UpLoader;
 import org.junit.Ignore;
 import org.junit.Test;
 
