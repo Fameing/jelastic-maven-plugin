@@ -220,38 +220,42 @@ public abstract class JelasticMojo extends AbstractMojo {
     }
 
     public Authentication authentication() throws MojoExecutionException {
-        List<Proxy> proxyList = mavenSession.getSettings().getProxies();
-        HttpHost http_proxy = null;
-        for (Proxy proxy : proxyList) {
-            if (proxy.getProtocol().equals("http") || proxy.isActive()) {
-                http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
+        Authentication authentication = new Authentication();
+        if (System.getProperty("jelastic-session") != null && System.getProperty("jelastic-session").length() > 0) {
+            authentication.setSession(System.getProperty("jelastic-session"));
+            authentication.setResult(0);
+        } else {
+            List<Proxy> proxyList = mavenSession.getSettings().getProxies();
+            HttpHost http_proxy = null;
+            for (Proxy proxy : proxyList) {
+                if (proxy.getProtocol().equals("http") || proxy.isActive()) {
+                    http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
+                }
             }
-        }
-        Authentication authentication = null;
-
-        try {
-            DefaultHttpClient httpclient = new DefaultHttpClient();
-            if (http_proxy != null) {
+            try {
+                DefaultHttpClient httpclient = new DefaultHttpClient();
+                if (http_proxy != null) {
+                    httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
+                }
                 httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
+                List<NameValuePair> qparams = new ArrayList<NameValuePair>();
+                qparams.add(new BasicNameValuePair("login", getEmail()));
+                qparams.add(new BasicNameValuePair("password", getPassword()));
+                URI uri = URIUtils.createURI(getShema(), getApiJelastic(), getPort(), getUrlAuthentication(), URLEncodedUtils.format(qparams, "UTF-8"), null);
+                getLog().debug(uri.toString());
+                HttpGet httpGet = new HttpGet(uri);
+                ResponseHandler<String> responseHandler = new BasicResponseHandler();
+                String responseBody = httpclient.execute(httpGet, responseHandler);
+                getLog().debug(responseBody);
+                authentication = mapper.readValue(responseBody, Authentication.class);
+                cookieStore = httpclient.getCookieStore();
+            } catch (URISyntaxException e) {
+                getLog().error(e.getMessage(), e);
+            } catch (ClientProtocolException e) {
+                getLog().error(e.getMessage(), e);
+            } catch (IOException e) {
+                getLog().error(e.getMessage(), e);
             }
-            httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
-            List<NameValuePair> qparams = new ArrayList<NameValuePair>();
-            qparams.add(new BasicNameValuePair("login", getEmail()));
-            qparams.add(new BasicNameValuePair("password", getPassword()));
-            URI uri = URIUtils.createURI(getShema(), getApiJelastic(), getPort(), getUrlAuthentication(), URLEncodedUtils.format(qparams, "UTF-8"), null);
-            getLog().debug(uri.toString());
-            HttpGet httpGet = new HttpGet(uri);
-            ResponseHandler<String> responseHandler = new BasicResponseHandler();
-            String responseBody = httpclient.execute(httpGet, responseHandler);
-            getLog().debug(responseBody);
-            authentication = mapper.readValue(responseBody, Authentication.class);
-            cookieStore = httpclient.getCookieStore();
-        } catch (URISyntaxException e) {
-            getLog().error(e.getMessage(), e);
-        } catch (ClientProtocolException e) {
-            getLog().error(e.getMessage(), e);
-        } catch (IOException e) {
-            getLog().error(e.getMessage(), e);
         }
         return authentication;
     }
