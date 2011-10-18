@@ -33,11 +33,12 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.message.AbstractHttpMessage;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.settings.Proxy;
+import org.apache.maven.settings.Proxy;        
 import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.File;
@@ -48,6 +49,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.Map;
 
 public abstract class JelasticMojo extends AbstractMojo {
     private String shema = "http";
@@ -84,6 +86,13 @@ public abstract class JelasticMojo extends AbstractMojo {
      * @required
      */
     private MavenSession mavenSession;
+
+    /**
+     * Headers Properties.
+     *
+     * @parameter
+     */
+    private Map<String,String> headers;
 
     /**
      * Email Properties.
@@ -236,6 +245,10 @@ public abstract class JelasticMojo extends AbstractMojo {
 
     public Authentication authentication() throws MojoExecutionException {
         Authentication authentication = new Authentication();
+        String jelasticHeaders = System.getProperty("jelastic-headers");
+        if (jelasticHeaders != null && jelasticHeaders.length() > 0) {
+            headers = mapper.readValue(jelasticHeaders, Map.class);
+        }
         if (System.getProperty("jelastic-session") != null && System.getProperty("jelastic-session").length() > 0) {
             authentication.setSession(System.getProperty("jelastic-session"));
             authentication.setResult(0);
@@ -302,10 +315,10 @@ public abstract class JelasticMojo extends AbstractMojo {
             multipartEntity.addPart("session", new StringBody(authentication.getSession()));
             multipartEntity.addPart("file", new FileBody(file));
 
-
             URI uri = URIUtils.createURI(getShema(), getApiJelastic(), getPort(), getUrlUploader(), null, null);
             getLog().debug(uri.toString());
             HttpPost httpPost = new HttpPost(uri);
+            addHeaders(httpPost);
             httpPost.setEntity(multipartEntity);
 
             ResponseHandler<String> responseHandler = new BasicResponseHandler();
@@ -354,6 +367,7 @@ public abstract class JelasticMojo extends AbstractMojo {
             URI uri = URIUtils.createURI(getShema(), getApiJelastic(), getPort(), getUrlCreateObject(), null, null);
             getLog().debug(uri.toString());
             HttpPost httpPost = new HttpPost(uri);
+            addHeaders(httpPost);
             httpPost.setEntity(entity);
 
             ResponseHandler<String> responseHandler = new BasicResponseHandler();
@@ -396,6 +410,7 @@ public abstract class JelasticMojo extends AbstractMojo {
             URI uri = URIUtils.createURI(getShema(), getApiJelastic(), getPort(), getUrlDeploy(), URLEncodedUtils.format(qparams, "UTF-8"), null);
             getLog().debug(uri.toString());
             HttpGet httpPost = new HttpGet(uri);
+            addHeaders(httpPost);            
             ResponseHandler<String> responseHandler = new BasicResponseHandler();
             String responseBody = httpclient.execute(httpPost, responseHandler);
             getLog().debug(responseBody);
@@ -408,5 +423,14 @@ public abstract class JelasticMojo extends AbstractMojo {
             getLog().error(e.getMessage(), e);
         }
         return deploy;
+    }
+    
+    private void addHeaders(AbstractHttpMessage message){
+        if (headers != null){
+            for (String key : headers.keySet()){
+                String value = headers.get(key);
+                message.addHeader(key, value);
+            }
+        }    
     }
 }
