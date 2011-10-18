@@ -199,7 +199,11 @@ public abstract class JelasticMojo extends AbstractMojo {
 
     public String getContext() {
         if (isExternalParameterPassed()) {
-            return properties.getProperty("context");
+            if (properties.getProperty("context") != null && properties.getProperty("context").length() > 0) {
+                return properties.getProperty("context");
+            } else {
+                return context;
+            }
         } else {
             return context;
         }
@@ -207,7 +211,11 @@ public abstract class JelasticMojo extends AbstractMojo {
 
     public String getEnvironment() {
         if (isExternalParameterPassed()) {
-            return properties.getProperty("environment");
+            if (properties.getProperty("environment") != null && properties.getProperty("environment").length() > 0) {
+                return properties.getProperty("environment");
+            } else {
+                return environment;
+            }
         } else {
             return environment;
         }
