@@ -1,4 +1,8 @@
-package org.codehaus.mojo.jelastic.model;
+package com.jelastic.model;
+
+
+//{"response":{"result":8,"error":"access not permitted [subject = 11759/0 accessObject = [JDeploy, JDeploy/*] rights = [CREATE, CREATE_ONCE]]"},"result":0,"debug":{"time":64,"cpu":{"usage":9.757838,"time":50}}}
+
 
 public class CreateObject {
     private JelasticResponse response;
@@ -42,6 +46,7 @@ public class CreateObject {
     public static class JelasticResponse {
         private int id;
         private int result;
+        private String error;
         private JelasticObject object;
 
         public int getId() {
@@ -54,6 +59,14 @@ public class CreateObject {
 
         public int getResult() {
             return result;
+        }
+
+        public String getError() {
+            return error;
+        }
+
+        public void setError(String error) {
+            this.error = error;
         }
 
         public void setResult(int result) {

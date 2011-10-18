@@ -1,4 +1,4 @@
-package org.codehaus.mojo.jelastic;
+package com.jelastic;
 
 /**
  * User: Igor.Yova@gmail.com
@@ -14,6 +14,7 @@ package org.codehaus.mojo.jelastic;
  *        http://live.jelastic.com/deploy/DeployArchive
  */
 
+import com.jelastic.model.*;
 import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -38,10 +39,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Proxy;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.mojo.jelastic.model.Authentication;
-import org.codehaus.mojo.jelastic.model.CreateObject;
-import org.codehaus.mojo.jelastic.model.Deploy;
-import org.codehaus.mojo.jelastic.model.UpLoader;
 
 import java.io.File;
 import java.io.FileInputStream;

@@ -1,4 +1,4 @@
-package org.codehaus.mojo.jelastic.model;
+package com.jelastic.model;
 
 /**
  * User: Igor.Yova@gmail.com
