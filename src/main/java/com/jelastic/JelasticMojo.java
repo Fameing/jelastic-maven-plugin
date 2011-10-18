@@ -67,7 +67,7 @@ public abstract class JelasticMojo extends AbstractMojo {
     private static ObjectMapper mapper = new ObjectMapper();
     private static Properties properties = new Properties();
 
-
+    
     /**
      * The maven project.
      *
@@ -247,7 +247,11 @@ public abstract class JelasticMojo extends AbstractMojo {
         Authentication authentication = new Authentication();
         String jelasticHeaders = System.getProperty("jelastic-headers");
         if (jelasticHeaders != null && jelasticHeaders.length() > 0) {
-            headers = mapper.readValue(jelasticHeaders, Map.class);
+            try{
+                headers = mapper.readValue(jelasticHeaders, Map.class);
+            } catch (IOException e) {
+                getLog().error(e.getMessage(), e);
+            }    
         }
         if (System.getProperty("jelastic-session") != null && System.getProperty("jelastic-session").length() > 0) {
             authentication.setSession(System.getProperty("jelastic-session"));
