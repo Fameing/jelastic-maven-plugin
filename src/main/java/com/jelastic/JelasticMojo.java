@@ -96,7 +96,6 @@ public abstract class JelasticMojo extends AbstractMojo {
      * Password Properties.
      *
      * @parameter
-     * @required
      */
     private String password;
 
