@@ -27,7 +27,7 @@ public class DeployMojo extends JelasticMojo {
             getLog().info("------------------------------------------------------------------------");
             getLog().info("   Authentication : SUCCESS");
             getLog().info("          Session : " + authentication.getSession());
-            getLog().info("              Uid : " + authentication.getUid());
+            //getLog().info("              Uid : " + authentication.getUid());
             getLog().info("------------------------------------------------------------------------");
             UpLoader upLoader = upload(authentication);
             if (upLoader.getResult() == 0) {
