@@ -41,16 +41,17 @@ import org.apache.maven.settings.Proxy;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 public abstract class JelasticMojo extends AbstractMojo {
     private String shema = "http";
     private String apiJelastic = "api.jelastic.com";
-
 
 
     private int port = -1;
@@ -62,6 +63,7 @@ public abstract class JelasticMojo extends AbstractMojo {
     private String urlCreateObject = "/deploy/createobject";
     private String urlDeploy = "/deploy/DeployArchive";
     private static ObjectMapper mapper = new ObjectMapper();
+    private static Properties properties = new Properties();
 
 
     /**
@@ -74,7 +76,7 @@ public abstract class JelasticMojo extends AbstractMojo {
 
     private MavenProject project;
 
-     /**
+    /**
      * The Maven session.
      *
      * @parameter expression="${session}"
@@ -172,19 +174,49 @@ public abstract class JelasticMojo extends AbstractMojo {
     }
 
     public String getEmail() {
-        return email;
+        if (isExternalParameterPassed()) {
+            return properties.getProperty("email");
+        } else {
+            return email;
+        }
     }
 
     public String getPassword() {
-        return password;
+        if (isExternalParameterPassed()) {
+            return properties.getProperty("password");
+        } else {
+            return password;
+        }
     }
 
     public String getContext() {
-        return context;
+        if (isExternalParameterPassed()) {
+            return properties.getProperty("context");
+        } else {
+            return context;
+        }
     }
 
     public String getEnvironment() {
-        return environment;
+        if (isExternalParameterPassed()) {
+            return properties.getProperty("environment");
+        } else {
+            return environment;
+        }
+    }
+
+    public boolean isExternalParameterPassed() {
+        if (System.getProperty("jelastic-properties") != null && System.getProperty("jelastic-properties").length() > 0) {
+            try {
+                properties.load(new FileInputStream(System.getProperty("jelastic-properties")));
+            } catch (IOException e) {
+                getLog().error(e.getMessage(), e);
+                return false;
+            }
+        } else {
+            return false;
+        }
+        return true;
     }
 
     public Authentication authentication() throws MojoExecutionException {
@@ -297,7 +329,7 @@ public abstract class JelasticMojo extends AbstractMojo {
             UrlEncodedFormEntity entity = new UrlEncodedFormEntity(nameValuePairList, "UTF-8");
 
             for (NameValuePair nameValuePair : nameValuePairList) {
-               getLog().debug(nameValuePair.getName() + " : " + nameValuePair.getValue());
+                getLog().debug(nameValuePair.getName() + " : " + nameValuePair.getValue());
             }
 
             URI uri = URIUtils.createURI(getShema(), getApiJelastic(), getPort(), getUrlCreateObject(), null, null);
