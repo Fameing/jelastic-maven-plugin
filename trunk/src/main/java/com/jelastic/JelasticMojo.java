@@ -175,7 +175,11 @@ public abstract class JelasticMojo extends AbstractMojo {
 
     public String getEmail() {
         if (isExternalParameterPassed()) {
-            return properties.getProperty("email");
+            if (properties.getProperty("jelastic-email") != null && properties.getProperty("jelastic-email").length() > 0) {
+                return properties.getProperty("jelastic-email");
+            } else {
+                return email;
+            }
         } else {
             return email;
         }
@@ -183,7 +187,11 @@ public abstract class JelasticMojo extends AbstractMojo {
 
     public String getPassword() {
         if (isExternalParameterPassed()) {
-            return properties.getProperty("password");
+            if (properties.getProperty("jelastic-password") != null && properties.getProperty("jelastic-password").length() > 0) {
+                return properties.getProperty("jelastic-password");
+            } else {
+                return password;
+            }
         } else {
             return password;
         }
