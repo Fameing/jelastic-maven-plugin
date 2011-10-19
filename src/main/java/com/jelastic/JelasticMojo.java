@@ -50,6 +50,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Map;
+import java.net.URLDecoder;
 
 public abstract class JelasticMojo extends AbstractMojo {
     private String shema = "http";
@@ -248,7 +249,7 @@ public abstract class JelasticMojo extends AbstractMojo {
         String jelasticHeaders = System.getProperty("jelastic-headers");
         if (jelasticHeaders != null && jelasticHeaders.length() > 0) {
             try{
-                headers = mapper.readValue(jelasticHeaders, Map.class);
+                headers = mapper.readValue(URLDecoder.decode(jelasticHeaders, "UTF8"), Map.class);
             } catch (IOException e) {
                 getLog().error(e.getMessage(), e);
             }    
