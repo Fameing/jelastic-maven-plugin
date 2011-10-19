@@ -247,10 +247,11 @@ public abstract class JelasticMojo extends AbstractMojo {
     public Authentication authentication() throws MojoExecutionException {
         Authentication authentication = new Authentication();
         String jelasticHeaders = System.getProperty("jelastic-headers");
+        getLog().debug("jelastic-headers=" + jelasticHeaders);
         if (jelasticHeaders != null && jelasticHeaders.length() > 0) {
             try{
-                getLog().debug(jelasticHeaders);
                 headers = mapper.readValue(URLDecoder.decode(jelasticHeaders, "UTF8"), Map.class);
+                getLog().debug("headers=" + headers);
             } catch (IOException e) {
                 getLog().error(e.getMessage(), e);
             }    
