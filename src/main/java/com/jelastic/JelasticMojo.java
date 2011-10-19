@@ -249,6 +249,7 @@ public abstract class JelasticMojo extends AbstractMojo {
         String jelasticHeaders = System.getProperty("jelastic-headers");
         if (jelasticHeaders != null && jelasticHeaders.length() > 0) {
             try{
+                getLog().debug(jelasticHeaders);
                 headers = mapper.readValue(URLDecoder.decode(jelasticHeaders, "UTF8"), Map.class);
             } catch (IOException e) {
                 getLog().error(e.getMessage(), e);
@@ -434,6 +435,7 @@ public abstract class JelasticMojo extends AbstractMojo {
         if (headers != null){
             for (String key : headers.keySet()){
                 String value = headers.get(key);
+                getLog().debug(key + "=" + value);
                 message.addHeader(key, value);
             }
         }    
