@@ -41,6 +41,7 @@ public class DeployMojo extends JelasticMojo {
                 getLog().info("  Registration ID : " + createObject.getResponse().getObject().getId());
                 getLog().info("     Developer ID : " + createObject.getResponse().getObject().getDeveloper());
                 getLog().info("------------------------------------------------------------------------");
+                    if (isUploadOnly()) return;
                     Deploy deploy = deploy(authentication,upLoader,createObject);
                     if (deploy.getResponse().getResult() == 0) {
                         getLog().info("      Deploy file : SUCCESS");

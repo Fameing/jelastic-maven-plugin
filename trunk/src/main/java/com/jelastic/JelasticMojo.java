@@ -243,6 +243,11 @@ public abstract class JelasticMojo extends AbstractMojo {
         }
         return true;
     }
+    
+    public boolean isUploadOnly() {
+        String uploadOnly = System.getProperty("jelastic-upload-only");
+        return uploadOnly != null && (uploadOnly.equalsIgnoreCase("1") || uploadOnly.equalsIgnoreCase("true"));        
+    }
 
     public Authentication authentication() throws MojoExecutionException {
         Authentication authentication = new Authentication();
