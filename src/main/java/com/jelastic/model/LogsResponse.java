@@ -1,10 +1,13 @@
 package com.jelastic.model;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
 /**
  * User: Igor.Yova@gmail.com
  * Date: 6/9/11
  * Time: 7:16 PM
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class LogsResponse {
     private String body;
     private int result;

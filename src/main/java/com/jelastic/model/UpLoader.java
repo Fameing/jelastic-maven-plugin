@@ -1,10 +1,13 @@
 package com.jelastic.model;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
 /**
  * User: Igor.Yova@gmail.com
  * Date: 6/9/11
  * Time: 3:18 PM
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UpLoader {
     private int result;
     private String file;
@@ -25,6 +28,7 @@ public class UpLoader {
         this.error = error;
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class JelasticRequest {
         private String fid;
         private String session;

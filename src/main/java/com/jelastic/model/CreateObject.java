@@ -3,7 +3,9 @@ package com.jelastic.model;
 
 //{"response":{"result":8,"error":"access not permitted [subject = 11759/0 accessObject = [JDeploy, JDeploy/*] rights = [CREATE, CREATE_ONCE]]"},"result":0,"debug":{"time":64,"cpu":{"usage":9.757838,"time":50}}}
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CreateObject {
     private JelasticResponse response;
     private int result;
@@ -13,6 +15,7 @@ public class CreateObject {
     public CreateObject() {
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class JelasticObject {
         private int id;
         private String developer;
@@ -42,7 +45,7 @@ public class CreateObject {
             this.uploadDate = uploadDate;
         }
     }
-
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class JelasticResponse {
         private int id;
         private int result;
