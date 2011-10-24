@@ -1,10 +1,13 @@
 package com.jelastic.model;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
 /**
  * User: Igor.Yova@gmail.com
  * Date: 6/9/11
  * Time: 12:10 PM
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Authentication {
     private String uid;
     private int result;

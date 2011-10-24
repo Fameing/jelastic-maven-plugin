@@ -1,10 +1,13 @@
 package com.jelastic.model;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
 /**
  * User: Igor.Yova@gmail.com
  * Date: 6/9/11
  * Time: 4:13 PM
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Deploy {
 
     //{"response":{"result":0,"responses":[{"result":0,"nodeid":1566,"out":"gfhdf"}]},"result":0,"debug":{"time":17593,"cpu":{"usage":0.01421001,"time":20}}}
@@ -24,6 +27,7 @@ public class Deploy {
         this.debug = debug;
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
      public static class JelasticResponse {
         private int result;
         private JelasticResponses[] responses;
@@ -62,6 +66,7 @@ public class Deploy {
              this.out = out;
          }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
          public static class JelasticResponses {
              private int result;
              private int nodeid;
