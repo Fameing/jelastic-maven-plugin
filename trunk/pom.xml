@@ -3,7 +3,7 @@
 
     <groupId>com.jelastic</groupId>
     <artifactId>jelastic-maven-plugin</artifactId>
-    <version>1.5</version>
+    <version>1.6-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
     <name>jelastic-maven-plugin</name>
     <url>http://code.google.com/p/jelastic-maven-plugin</url>
@@ -234,9 +234,9 @@
         <url>https://code.google.com/p/jelastic-maven-plugin/issues/list</url>
     </issueManagement>
     <scm>
-        <connection>scm:svn:https://jelastic-maven-plugin.googlecode.com/svn/tags/jelastic-maven-plugin-1.5</connection>
-        <developerConnection>scm:svn:https://jelastic-maven-plugin.googlecode.com/svn/tags/jelastic-maven-plugin-1.5</developerConnection>
-        <url>https://jelastic-maven-plugin.googlecode.com/svn/tags/jelastic-maven-plugin-1.5</url>
+        <connection>scm:svn:https://jelastic-maven-plugin.googlecode.com/svn/trunk/</connection>
+        <developerConnection>scm:svn:https://jelastic-maven-plugin.googlecode.com/svn/trunk/</developerConnection>
+        <url>https://jelastic-maven-plugin.googlecode.com/svn/trunk/</url>
     </scm>
 
     <distributionManagement>
