@@ -54,9 +54,6 @@ import java.net.URLDecoder;
 
 public abstract class JelasticMojo extends AbstractMojo {
     private String shema = "http";
-    private String apiJelastic = "api.jelastic.com";
-
-
     private int port = -1;
     private String version = "1.0";
 
@@ -118,6 +115,14 @@ public abstract class JelasticMojo extends AbstractMojo {
 
 
     /**
+     * Context Properties.
+     *
+     * @parameter default-value="api.jelastic.com"
+     */
+    private String api_hoster;
+
+
+    /**
      * Environment name Properties.
      *
      * @parameter
@@ -153,9 +158,11 @@ public abstract class JelasticMojo extends AbstractMojo {
 
     public String getApiJelastic() {
         if (System.getProperty("jelastic-hoster") != null && System.getProperty("jelastic-hoster").length() > 0) {
-            apiJelastic = System.getProperty("jelastic-hoster");
+            api_hoster = System.getProperty("jelastic-hoster");
+        } else if (api_hoster.trim().equals("")) {
+            api_hoster = "api.jelastic.com";
         }
-        return apiJelastic;
+        return api_hoster;
     }
 
     public int getPort() {
