@@ -252,7 +252,7 @@
         </snapshotRepository>
     </distributionManagement>
 
-    <repositories>
+<!--    <repositories>
         <repository>
             <snapshots>
                 <enabled>false</enabled>
@@ -283,5 +283,5 @@
             <name>plugins-snapshot</name>
             <url>http://maven.jelastic.com/plugins-snapshot/</url>
         </pluginRepository>
-    </pluginRepositories>
+    </pluginRepositories>-->
 </project>
