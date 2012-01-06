@@ -159,8 +159,6 @@ public abstract class JelasticMojo extends AbstractMojo {
     public String getApiJelastic() {
         if (System.getProperty("jelastic-hoster") != null && System.getProperty("jelastic-hoster").length() > 0) {
             api_hoster = System.getProperty("jelastic-hoster");
-        } else if (api_hoster.trim().equals("")) {
-            api_hoster = "api.jelastic.com";
         }
         return api_hoster;
     }
