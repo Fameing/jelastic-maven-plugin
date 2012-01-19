@@ -53,7 +53,7 @@ import java.util.Map;
 import java.net.URLDecoder;
 
 public abstract class JelasticMojo extends AbstractMojo {
-    private String shema = "http";
+    private String shema = "https";
     private int port = -1;
     private String version = "1.0";
 
@@ -273,7 +273,9 @@ public abstract class JelasticMojo extends AbstractMojo {
             List<Proxy> proxyList = mavenSession.getSettings().getProxies();
             HttpHost http_proxy = null;
             for (Proxy proxy : proxyList) {
-                if (proxy.getProtocol().equals("http") || proxy.isActive()) {
+                if (proxy.getProtocol().equalsIgnoreCase("http") || proxy.isActive()) {
+                    http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
+                } else if (proxy.getProtocol().equalsIgnoreCase("https") || proxy.isActive()){
                     http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
                 }
             }
@@ -310,7 +312,9 @@ public abstract class JelasticMojo extends AbstractMojo {
         List<Proxy> proxyList = mavenSession.getSettings().getProxies();
         HttpHost http_proxy = null;
         for (Proxy proxy : proxyList) {
-            if (proxy.getProtocol().equals("http") || proxy.isActive()) {
+            if (proxy.getProtocol().equalsIgnoreCase("http") || proxy.isActive()) {
+                http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
+            } else if (proxy.getProtocol().equalsIgnoreCase("https") || proxy.isActive()){
                 http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
             }
         }
@@ -357,7 +361,9 @@ public abstract class JelasticMojo extends AbstractMojo {
         List<Proxy> proxyList = mavenSession.getSettings().getProxies();
         HttpHost http_proxy = null;
         for (Proxy proxy : proxyList) {
-            if (proxy.getProtocol().equals("http") || proxy.isActive()) {
+            if (proxy.getProtocol().equalsIgnoreCase("http") || proxy.isActive()) {
+                http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
+            } else if (proxy.getProtocol().equalsIgnoreCase("https") || proxy.isActive()){
                 http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
             }
         }
@@ -406,7 +412,9 @@ public abstract class JelasticMojo extends AbstractMojo {
         List<Proxy> proxyList = mavenSession.getSettings().getProxies();
         HttpHost http_proxy = null;
         for (Proxy proxy : proxyList) {
-            if (proxy.getProtocol().equals("http") || proxy.isActive()) {
+            if (proxy.getProtocol().equalsIgnoreCase("http") || proxy.isActive()) {
+                http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
+            } else if (proxy.getProtocol().equalsIgnoreCase("https") || proxy.isActive()){
                 http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
             }
         }
