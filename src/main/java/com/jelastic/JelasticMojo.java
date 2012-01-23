@@ -19,7 +19,6 @@ import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CookieStore;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
@@ -43,7 +42,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.settings.Proxy;        
+import org.apache.maven.settings.Proxy;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.net.ssl.SSLContext;
@@ -52,6 +51,7 @@ import javax.net.ssl.X509TrustManager;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.cert.CertificateException;
@@ -66,7 +66,8 @@ public abstract class JelasticMojo extends AbstractMojo {
     private String shema = "https";
     private int port = -1;
     private String version = "1.0";
-
+    private long totalSize;
+    private int numSt;
     private CookieStore cookieStore = null;
     private String urlAuthentication = "/" + version + "/users/authentication/rest/signin";
     private String urlUploader = "/" + version + "/storage/uploader/rest/upload";
@@ -75,7 +76,7 @@ public abstract class JelasticMojo extends AbstractMojo {
     private static ObjectMapper mapper = new ObjectMapper();
     private static Properties properties = new Properties();
 
-    
+
     /**
      * The maven project.
      *
@@ -100,7 +101,7 @@ public abstract class JelasticMojo extends AbstractMojo {
      *
      * @parameter
      */
-    private Map<String,String> headers;
+    private Map<String, String> headers;
 
     /**
      * Email Properties.
@@ -258,10 +259,10 @@ public abstract class JelasticMojo extends AbstractMojo {
         }
         return true;
     }
-    
+
     public boolean isUploadOnly() {
         String uploadOnly = System.getProperty("jelastic-upload-only");
-        return uploadOnly != null && (uploadOnly.equalsIgnoreCase("1") || uploadOnly.equalsIgnoreCase("true"));        
+        return uploadOnly != null && (uploadOnly.equalsIgnoreCase("1") || uploadOnly.equalsIgnoreCase("true"));
     }
 
     public Authentication authentication() throws MojoExecutionException {
@@ -269,12 +270,12 @@ public abstract class JelasticMojo extends AbstractMojo {
         String jelasticHeaders = System.getProperty("jelastic-headers");
         getLog().debug("jelastic-headers=" + jelasticHeaders);
         if (jelasticHeaders != null && jelasticHeaders.length() > 0) {
-            try{
+            try {
                 headers = mapper.readValue(URLDecoder.decode(jelasticHeaders, "UTF8"), Map.class);
                 getLog().debug("headers=" + headers);
             } catch (IOException e) {
                 getLog().error(e.getMessage(), e);
-            }    
+            }
         }
         if (System.getProperty("jelastic-session") != null && System.getProperty("jelastic-session").length() > 0) {
             authentication.setSession(System.getProperty("jelastic-session"));
@@ -285,7 +286,7 @@ public abstract class JelasticMojo extends AbstractMojo {
             for (Proxy proxy : proxyList) {
                 if (proxy.getProtocol().equalsIgnoreCase("http") || proxy.isActive()) {
                     http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
-                } else if (proxy.getProtocol().equalsIgnoreCase("https") || proxy.isActive()){
+                } else if (proxy.getProtocol().equalsIgnoreCase("https") || proxy.isActive()) {
                     http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
                 }
             }
@@ -325,7 +326,7 @@ public abstract class JelasticMojo extends AbstractMojo {
         for (Proxy proxy : proxyList) {
             if (proxy.getProtocol().equalsIgnoreCase("http") || proxy.isActive()) {
                 http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
-            } else if (proxy.getProtocol().equalsIgnoreCase("https") || proxy.isActive()){
+            } else if (proxy.getProtocol().equalsIgnoreCase("https") || proxy.isActive()) {
                 http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
             }
         }
@@ -338,15 +339,26 @@ public abstract class JelasticMojo extends AbstractMojo {
             httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
             httpclient.setCookieStore(getCookieStore());
 
-            File file = new File(getOutputDirectory() + File.separator + getFinalName() + "." + project.getModel().getPackaging());
+            final File file = new File(getOutputDirectory() + File.separator + getFinalName() + "." + project.getModel().getPackaging());
             if (!file.exists()) {
                 throw new MojoExecutionException("First build artifact and try again. Artifact not found " + getFinalName() + "." + project.getModel().getPackaging());
             }
 
-            MultipartEntity multipartEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
+
+            getLog().info("File Uploading Progress :");
+            CustomMultiPartEntity multipartEntity = new CustomMultiPartEntity(HttpMultipartMode.BROWSER_COMPATIBLE, new CustomMultiPartEntity.ProgressListener() {
+                public void transferred(long num) {
+                    if (((int) ((num / (float) totalSize) * 100)) != numSt) {
+                        getLog().info("[" + (int) ((num / (float) totalSize) * 100) + "%]");
+                        numSt = ((int) ((num / (float) totalSize) * 100));
+                    }
+                }
+            });
+
             multipartEntity.addPart("fid", new StringBody("123456"));
             multipartEntity.addPart("session", new StringBody(authentication.getSession()));
             multipartEntity.addPart("file", new FileBody(file));
+            totalSize = multipartEntity.getContentLength();
 
             URI uri = URIUtils.createURI(getShema(), getApiJelastic(), getPort(), getUrlUploader(), null, null);
             getLog().debug(uri.toString());
@@ -375,7 +387,7 @@ public abstract class JelasticMojo extends AbstractMojo {
         for (Proxy proxy : proxyList) {
             if (proxy.getProtocol().equalsIgnoreCase("http") || proxy.isActive()) {
                 http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
-            } else if (proxy.getProtocol().equalsIgnoreCase("https") || proxy.isActive()){
+            } else if (proxy.getProtocol().equalsIgnoreCase("https") || proxy.isActive()) {
                 http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
             }
         }
@@ -427,7 +439,7 @@ public abstract class JelasticMojo extends AbstractMojo {
         for (Proxy proxy : proxyList) {
             if (proxy.getProtocol().equalsIgnoreCase("http") || proxy.isActive()) {
                 http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
-            } else if (proxy.getProtocol().equalsIgnoreCase("https") || proxy.isActive()){
+            } else if (proxy.getProtocol().equalsIgnoreCase("https") || proxy.isActive()) {
                 http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
             }
         }
@@ -450,7 +462,7 @@ public abstract class JelasticMojo extends AbstractMojo {
             URI uri = URIUtils.createURI(getShema(), getApiJelastic(), getPort(), getUrlDeploy(), URLEncodedUtils.format(qparams, "UTF-8"), null);
             getLog().debug(uri.toString());
             HttpGet httpPost = new HttpGet(uri);
-            addHeaders(httpPost);            
+            addHeaders(httpPost);
             ResponseHandler<String> responseHandler = new BasicResponseHandler();
             String responseBody = httpclient.execute(httpPost, responseHandler);
             getLog().debug(responseBody);
@@ -464,15 +476,15 @@ public abstract class JelasticMojo extends AbstractMojo {
         }
         return deploy;
     }
-    
-    private void addHeaders(AbstractHttpMessage message){
-        if (headers != null){
-            for (String key : headers.keySet()){
+
+    private void addHeaders(AbstractHttpMessage message) {
+        if (headers != null) {
+            for (String key : headers.keySet()) {
                 String value = headers.get(key);
                 getLog().debug(key + "=" + value);
                 message.addHeader(key, value);
             }
-        }    
+        }
     }
 
     public static DefaultHttpClient wrapClient(DefaultHttpClient base) {
@@ -481,8 +493,10 @@ public abstract class JelasticMojo extends AbstractMojo {
             X509TrustManager tm = new X509TrustManager() {
                 public void checkClientTrusted(X509Certificate[] xcs, String string) throws CertificateException {
                 }
+
                 public void checkServerTrusted(X509Certificate[] xcs, String string) throws CertificateException {
                 }
+
                 public X509Certificate[] getAcceptedIssuers() {
                     return null;
                 }
