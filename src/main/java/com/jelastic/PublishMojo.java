@@ -2,7 +2,6 @@ package com.jelastic;
 
 import com.jelastic.model.Authentication;
 import com.jelastic.model.CreateObject;
-import com.jelastic.model.Deploy;
 import com.jelastic.model.UpLoader;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
