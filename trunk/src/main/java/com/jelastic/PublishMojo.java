@@ -10,11 +10,9 @@ import org.apache.maven.plugin.MojoFailureException;
 /**
  * Goal which touches a timestamp file.
  *
- * @goal deploy
- * @phase install
+ * @goal publish
  */
-public class DeployMojo extends JelasticMojo {
-
+public class PublishMojo extends JelasticMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         Authentication authentication = authentication();
         if (authentication.getResult() == 0) {
@@ -31,20 +29,10 @@ public class DeployMojo extends JelasticMojo {
                 getLog().info("------------------------------------------------------------------------");
                 CreateObject createObject = createObject(upLoader,authentication);
                 if (createObject.getResult() == 0) {
-                getLog().info("File registration : SUCCESS");
-                getLog().info("  Registration ID : " + createObject.getResponse().getObject().getId());
-                getLog().info("     Developer ID : " + createObject.getResponse().getObject().getDeveloper());
-                getLog().info("------------------------------------------------------------------------");
-                    if (isUploadOnly()) return;
-                    Deploy deploy = deploy(authentication,upLoader,createObject);
-                    if (deploy.getResponse().getResult() == 0) {
-                        getLog().info("      Deploy file : SUCCESS");
-                        getLog().info("       Deploy log :");
-                        getLog().info(deploy.getResponse().getResponses()[0].getOut());
-                    } else {
-                        getLog().error("          Deploy : FAILED");
-                        getLog().error("           Error : " + deploy.getResponse().getError());
-                    }
+                    getLog().info("File registration : SUCCESS");
+                    getLog().info("  Registration ID : " + createObject.getResponse().getObject().getId());
+                    getLog().info("     Developer ID : " + createObject.getResponse().getObject().getDeveloper());
+                    getLog().info("------------------------------------------------------------------------");
                 }
             } else {
                 getLog().error("File upload : FAILED");
@@ -55,7 +43,5 @@ public class DeployMojo extends JelasticMojo {
             getLog().error("         Error : " + authentication.getError());
         }
 
-
     }
-
 }
