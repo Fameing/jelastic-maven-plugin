@@ -111,6 +111,14 @@ public abstract class JelasticMojo extends AbstractMojo {
     private String email;
 
     /**
+     * Comment Properties.
+     *
+     * @parameter
+     */
+    private String comment;
+
+
+    /**
      * Password Properties.
      *
      * @parameter
@@ -401,18 +409,20 @@ public abstract class JelasticMojo extends AbstractMojo {
             httpclient.setCookieStore(getCookieStore());
 
 
-            String comment = "";
+            String local_comment = "";
             if (System.getProperty("jelastic-comment") != null && System.getProperty("jelastic-comment").length() > 0) {
-                comment = System.getProperty("jelastic-comment");
+                local_comment = System.getProperty("jelastic-comment");
+            } else if (comment != null && !comment.isEmpty()) {
+                local_comment = comment;
             } else {
-                comment = getFinalName() + "." + project.getModel().getPackaging();
+                local_comment = getFinalName() + "." + project.getModel().getPackaging();
             }
 
             List<NameValuePair> nameValuePairList = new ArrayList<NameValuePair>();
             nameValuePairList.add(new BasicNameValuePair("charset", "UTF-8"));
             nameValuePairList.add(new BasicNameValuePair("session", authentication.getSession()));
             nameValuePairList.add(new BasicNameValuePair("type", "JDeploy"));
-            nameValuePairList.add(new BasicNameValuePair("data", "{'name':'" + getFinalName() + "." + project.getModel().getPackaging() + "', 'archive':'" + upLoader.getFile() + "', 'link':0, 'size':" + upLoader.getSize() + ", 'comment':'" + comment + "'}"));
+            nameValuePairList.add(new BasicNameValuePair("data", "{'name':'" + getFinalName() + "." + project.getModel().getPackaging() + "', 'archive':'" + upLoader.getFile() + "', 'link':0, 'size':" + upLoader.getSize() + ", 'comment':'" + local_comment + "'}"));
 
             UrlEncodedFormEntity entity = new UrlEncodedFormEntity(nameValuePairList, "UTF-8");
 
