@@ -2,6 +2,7 @@ package com.jelastic;
 
 import com.jelastic.model.Authentication;
 import com.jelastic.model.CreateObject;
+import com.jelastic.model.LogOut;
 import com.jelastic.model.UpLoader;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -32,6 +33,13 @@ public class PublishMojo extends JelasticMojo {
                     getLog().info("  Registration ID : " + createObject.getResponse().getObject().getId());
                     getLog().info("     Developer ID : " + createObject.getResponse().getObject().getDeveloper());
                     getLog().info("------------------------------------------------------------------------");
+                    LogOut logOut = logOut(authentication);
+                    if (logOut.getResult() == 0){
+                        getLog().info("           LogOut : SUCCESS");
+                    } else {
+                        getLog().info("LogOut : FAILED");
+                        getLog().error("Error : " + logOut.getError());
+                    }
                 }
             } else {
                 getLog().error("File upload : FAILED");

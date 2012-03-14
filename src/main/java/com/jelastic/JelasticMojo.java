@@ -15,6 +15,7 @@ package com.jelastic;
  */
 
 import com.jelastic.model.*;
+import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -30,6 +31,7 @@ import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
@@ -73,6 +75,7 @@ public abstract class JelasticMojo extends AbstractMojo {
     private String urlUploader = "/" + version + "/storage/uploader/rest/upload";
     private String urlCreateObject = "/deploy/createobject";
     private String urlDeploy = "/deploy/DeployArchive";
+    private String urlLogOut = "/users/authentication/rest/signout";
     private static ObjectMapper mapper = new ObjectMapper();
     private static Properties properties = new Properties();
 
@@ -206,6 +209,10 @@ public abstract class JelasticMojo extends AbstractMojo {
         return urlDeploy;
     }
 
+    public String getUrlLogOut() {
+        return urlLogOut;
+    }
+
     public String getEmail() {
         if (isExternalParameterPassed()) {
             if (properties.getProperty("jelastic-email") != null && properties.getProperty("jelastic-email").length() > 0) {
@@ -313,9 +320,15 @@ public abstract class JelasticMojo extends AbstractMojo {
                 HttpGet httpGet = new HttpGet(uri);
                 ResponseHandler<String> responseHandler = new BasicResponseHandler();
                 String responseBody = httpclient.execute(httpGet, responseHandler);
+                cookieStore = httpclient.getCookieStore();
+
+                List<Cookie> cookies = cookieStore.getCookies();
+                for (Cookie cookie : cookies) {
+                    getLog().debug(cookie.getName() + " = "+cookie.getValue());
+                }
+
                 getLog().debug(responseBody);
                 authentication = mapper.readValue(responseBody, Authentication.class);
-                cookieStore = httpclient.getCookieStore();
             } catch (URISyntaxException e) {
                 getLog().error(e.getMessage(), e);
             } catch (ClientProtocolException e) {
@@ -346,7 +359,9 @@ public abstract class JelasticMojo extends AbstractMojo {
             }
             httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
             httpclient.setCookieStore(getCookieStore());
-
+            for (Cookie cookie : httpclient.getCookieStore().getCookies()) {
+                getLog().debug(cookie.getName() + " = "+cookie.getValue());
+            }
             final File file = new File(getOutputDirectory() + File.separator + getFinalName() + "." + project.getModel().getPackaging());
             if (!file.exists()) {
                 throw new MojoExecutionException("First build artifact and try again. Artifact not found " + getFinalName() + "." + project.getModel().getPackaging());
@@ -407,7 +422,9 @@ public abstract class JelasticMojo extends AbstractMojo {
             }
             httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
             httpclient.setCookieStore(getCookieStore());
-
+            for (Cookie cookie : httpclient.getCookieStore().getCookies()) {
+                getLog().debug(cookie.getName() + " = "+cookie.getValue() );
+            }
 
             String local_comment = "";
             if (System.getProperty("jelastic-comment") != null && System.getProperty("jelastic-comment").length() > 0) {
@@ -469,6 +486,12 @@ public abstract class JelasticMojo extends AbstractMojo {
             }
 
             httpclient.setCookieStore(getCookieStore());
+
+            for (Cookie cookie : httpclient.getCookieStore().getCookies()) {
+                getLog().debug(cookie.getName() + " = "+cookie.getValue() );
+            }
+
+
             List<NameValuePair> qparams = new ArrayList<NameValuePair>();
             qparams.add(new BasicNameValuePair("charset", "UTF-8"));
             qparams.add(new BasicNameValuePair("session", authentication.getSession()));
@@ -494,6 +517,55 @@ public abstract class JelasticMojo extends AbstractMojo {
         }
         return deploy;
     }
+
+
+    public LogOut logOut(Authentication authentication) {
+        LogOut logOut = null;
+        List<Proxy> proxyList = mavenSession.getSettings().getProxies();
+        HttpHost http_proxy = null;
+        for (Proxy proxy : proxyList) {
+            if (proxy.getProtocol().equalsIgnoreCase("http") || proxy.isActive()) {
+                http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
+            } else if (proxy.getProtocol().equalsIgnoreCase("https") || proxy.isActive()) {
+                http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
+            }
+        }
+        try {
+            DefaultHttpClient httpclient = new DefaultHttpClient();
+            httpclient = wrapClient(httpclient);
+            if (http_proxy != null) {
+                httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
+            }
+
+            httpclient.setCookieStore(getCookieStore());
+
+            for (Cookie cookie : httpclient.getCookieStore().getCookies()) {
+                getLog().debug(cookie.getName() + " = "+cookie.getValue() );
+            }
+
+
+            List<NameValuePair> qparams = new ArrayList<NameValuePair>();
+            qparams.add(new BasicNameValuePair("charset", "UTF-8"));
+            qparams.add(new BasicNameValuePair("session", authentication.getSession()));
+
+            URI uri = URIUtils.createURI(getShema(), getApiJelastic(), getPort(), getUrlLogOut(), URLEncodedUtils.format(qparams, "UTF-8"), null);
+            getLog().debug(uri.toString());
+            HttpGet httpPost = new HttpGet(uri);
+            addHeaders(httpPost);
+            ResponseHandler<String> responseHandler = new BasicResponseHandler();
+            String responseBody = httpclient.execute(httpPost, responseHandler);
+            getLog().debug(responseBody);
+            logOut = mapper.readValue(responseBody, LogOut.class);
+        } catch (URISyntaxException e) {
+            getLog().error(e.getMessage(), e);
+        } catch (ClientProtocolException e) {
+            getLog().error(e.getMessage(), e);
+        } catch (IOException e) {
+            getLog().error(e.getMessage(), e);
+        }
+        return logOut;
+    }
+
 
     private void addHeaders(AbstractHttpMessage message) {
         if (headers != null) {
