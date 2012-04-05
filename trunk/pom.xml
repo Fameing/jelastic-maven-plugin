@@ -7,6 +7,7 @@
     <packaging>maven-plugin</packaging>
     <name>jelastic-maven-plugin</name>
     <url>http://code.google.com/p/jelastic-maven-plugin</url>
+    <description>Jelastic Maven plugin</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -223,16 +224,26 @@
         </plugins>
     </build>
 
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
     <developers>
         <developer>
             <name>Igor Yova</name>
             <email>Igor.Yova@gmail.com</email>
         </developer>
     </developers>
+
     <issueManagement>
         <system>Google Code Issue Tracking</system>
         <url>https://code.google.com/p/jelastic-maven-plugin/issues/list</url>
     </issueManagement>
+
     <scm>
         <connection>scm:svn:https://jelastic-maven-plugin.googlecode.com/svn/trunk/</connection>
         <developerConnection>scm:svn:https://jelastic-maven-plugin.googlecode.com/svn/trunk/</developerConnection>
@@ -240,15 +251,15 @@
     </scm>
 
     <distributionManagement>
-        <repository>
-            <id>jelastic.googlecode.releases</id>
-            <name>jelastic.googlecode.releases</name>
-            <url>dav:https://jelastic-maven-plugin.googlecode.com/svn/maven/repository</url>
-        </repository>
         <snapshotRepository>
-            <id>jelastic.googlecode.snapshots</id>
-            <name>jelastic.googlecode.snapshots</name>
-            <url>dav:https://jelastic-maven-plugin.googlecode.com/svn/maven/repository-snapshot</url>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Sonatype Nexus Snapshots</name>
+            <url>http://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
+        <repository>
+            <id>sonatype-nexus-staging</id>
+            <name>Nexus Release Repository</name>
+            <url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
     </distributionManagement>
 </project>
