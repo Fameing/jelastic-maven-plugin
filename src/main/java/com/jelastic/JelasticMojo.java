@@ -18,6 +18,9 @@ import com.jelastic.model.*;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.ResponseHandler;
@@ -292,6 +295,7 @@ public abstract class JelasticMojo extends AbstractMojo {
                 getLog().error(e.getMessage(), e);
             }
         }
+        UsernamePasswordCredentials usernamePasswordCredentials = null;
         if (System.getProperty("jelastic-session") != null && System.getProperty("jelastic-session").length() > 0) {
             authentication.setSession(System.getProperty("jelastic-session"));
             authentication.setResult(0);
@@ -301,8 +305,14 @@ public abstract class JelasticMojo extends AbstractMojo {
             for (Proxy proxy : proxyList) {
                 if (proxy.getProtocol().equalsIgnoreCase("http") || proxy.isActive()) {
                     http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
+                    if (proxy.getUsername() != null || proxy.getPassword() != null) {
+                        usernamePasswordCredentials = new UsernamePasswordCredentials(proxy.getUsername(), proxy.getPassword());
+                    }
                 } else if (proxy.getProtocol().equalsIgnoreCase("https") || proxy.isActive()) {
                     http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
+                    if (proxy.getUsername() != null || proxy.getPassword() != null) {
+                        usernamePasswordCredentials = new UsernamePasswordCredentials(proxy.getUsername(), proxy.getPassword());
+                    }
                 }
             }
             try {
@@ -310,6 +320,9 @@ public abstract class JelasticMojo extends AbstractMojo {
                 httpclient = wrapClient(httpclient);
                 if (http_proxy != null) {
                     httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
+                    if (usernamePasswordCredentials != null) {
+                        httpclient.getCredentialsProvider().setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT), usernamePasswordCredentials);
+                    }
                 }
                 httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
                 List<NameValuePair> qparams = new ArrayList<NameValuePair>();
@@ -324,7 +337,7 @@ public abstract class JelasticMojo extends AbstractMojo {
 
                 List<Cookie> cookies = cookieStore.getCookies();
                 for (Cookie cookie : cookies) {
-                    getLog().debug(cookie.getName() + " = "+cookie.getValue());
+                    getLog().debug(cookie.getName() + " = " + cookie.getValue());
                 }
 
                 getLog().debug(responseBody);
@@ -344,11 +357,18 @@ public abstract class JelasticMojo extends AbstractMojo {
         UpLoader upLoader = null;
         List<Proxy> proxyList = mavenSession.getSettings().getProxies();
         HttpHost http_proxy = null;
+        UsernamePasswordCredentials usernamePasswordCredentials = null;
         for (Proxy proxy : proxyList) {
             if (proxy.getProtocol().equalsIgnoreCase("http") || proxy.isActive()) {
                 http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
+                if (proxy.getUsername() != null || proxy.getPassword() != null) {
+                    usernamePasswordCredentials = new UsernamePasswordCredentials(proxy.getUsername(), proxy.getPassword());
+                }
             } else if (proxy.getProtocol().equalsIgnoreCase("https") || proxy.isActive()) {
                 http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
+                if (proxy.getUsername() != null || proxy.getPassword() != null) {
+                    usernamePasswordCredentials = new UsernamePasswordCredentials(proxy.getUsername(), proxy.getPassword());
+                }
             }
         }
         try {
@@ -356,11 +376,14 @@ public abstract class JelasticMojo extends AbstractMojo {
             httpclient = wrapClient(httpclient);
             if (http_proxy != null) {
                 httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
+                if (usernamePasswordCredentials != null) {
+                    httpclient.getCredentialsProvider().setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT), usernamePasswordCredentials);
+                }
             }
             httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
             httpclient.setCookieStore(getCookieStore());
             for (Cookie cookie : httpclient.getCookieStore().getCookies()) {
-                getLog().debug(cookie.getName() + " = "+cookie.getValue());
+                getLog().debug(cookie.getName() + " = " + cookie.getValue());
             }
             final File file = new File(getOutputDirectory() + File.separator + getFinalName() + "." + project.getModel().getPackaging());
             if (!file.exists()) {
@@ -407,11 +430,18 @@ public abstract class JelasticMojo extends AbstractMojo {
         CreateObject createObject = null;
         List<Proxy> proxyList = mavenSession.getSettings().getProxies();
         HttpHost http_proxy = null;
+        UsernamePasswordCredentials usernamePasswordCredentials = null;
         for (Proxy proxy : proxyList) {
             if (proxy.getProtocol().equalsIgnoreCase("http") || proxy.isActive()) {
                 http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
+                if (proxy.getUsername() != null || proxy.getPassword() != null) {
+                    usernamePasswordCredentials = new UsernamePasswordCredentials(proxy.getUsername(), proxy.getPassword());
+                }
             } else if (proxy.getProtocol().equalsIgnoreCase("https") || proxy.isActive()) {
                 http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
+                if (proxy.getUsername() != null || proxy.getPassword() != null) {
+                    usernamePasswordCredentials = new UsernamePasswordCredentials(proxy.getUsername(), proxy.getPassword());
+                }
             }
         }
         try {
@@ -419,11 +449,14 @@ public abstract class JelasticMojo extends AbstractMojo {
             httpclient = wrapClient(httpclient);
             if (http_proxy != null) {
                 httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
+                if (usernamePasswordCredentials != null) {
+                    httpclient.getCredentialsProvider().setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT), usernamePasswordCredentials);
+                }
             }
             httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
             httpclient.setCookieStore(getCookieStore());
             for (Cookie cookie : httpclient.getCookieStore().getCookies()) {
-                getLog().debug(cookie.getName() + " = "+cookie.getValue() );
+                getLog().debug(cookie.getName() + " = " + cookie.getValue());
             }
 
             String local_comment = "";
@@ -471,11 +504,18 @@ public abstract class JelasticMojo extends AbstractMojo {
         Deploy deploy = null;
         List<Proxy> proxyList = mavenSession.getSettings().getProxies();
         HttpHost http_proxy = null;
+        UsernamePasswordCredentials usernamePasswordCredentials = null;
         for (Proxy proxy : proxyList) {
             if (proxy.getProtocol().equalsIgnoreCase("http") || proxy.isActive()) {
                 http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
+                if (proxy.getUsername() != null || proxy.getPassword() != null) {
+                    usernamePasswordCredentials = new UsernamePasswordCredentials(proxy.getUsername(), proxy.getPassword());
+                }
             } else if (proxy.getProtocol().equalsIgnoreCase("https") || proxy.isActive()) {
                 http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
+                if (proxy.getUsername() != null || proxy.getPassword() != null) {
+                    usernamePasswordCredentials = new UsernamePasswordCredentials(proxy.getUsername(), proxy.getPassword());
+                }
             }
         }
         try {
@@ -483,12 +523,15 @@ public abstract class JelasticMojo extends AbstractMojo {
             httpclient = wrapClient(httpclient);
             if (http_proxy != null) {
                 httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
+                if (usernamePasswordCredentials != null) {
+                    httpclient.getCredentialsProvider().setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT), usernamePasswordCredentials);
+                }
             }
 
             httpclient.setCookieStore(getCookieStore());
 
             for (Cookie cookie : httpclient.getCookieStore().getCookies()) {
-                getLog().debug(cookie.getName() + " = "+cookie.getValue() );
+                getLog().debug(cookie.getName() + " = " + cookie.getValue());
             }
 
 
@@ -523,11 +566,18 @@ public abstract class JelasticMojo extends AbstractMojo {
         LogOut logOut = null;
         List<Proxy> proxyList = mavenSession.getSettings().getProxies();
         HttpHost http_proxy = null;
+        UsernamePasswordCredentials usernamePasswordCredentials = null;
         for (Proxy proxy : proxyList) {
             if (proxy.getProtocol().equalsIgnoreCase("http") || proxy.isActive()) {
                 http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
+                if (proxy.getUsername() != null || proxy.getPassword() != null) {
+                    usernamePasswordCredentials = new UsernamePasswordCredentials(proxy.getUsername(), proxy.getPassword());
+                }
             } else if (proxy.getProtocol().equalsIgnoreCase("https") || proxy.isActive()) {
                 http_proxy = new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol());
+                if (proxy.getUsername() != null || proxy.getPassword() != null) {
+                    usernamePasswordCredentials = new UsernamePasswordCredentials(proxy.getUsername(), proxy.getPassword());
+                }
             }
         }
         try {
@@ -535,12 +585,15 @@ public abstract class JelasticMojo extends AbstractMojo {
             httpclient = wrapClient(httpclient);
             if (http_proxy != null) {
                 httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
+                if (usernamePasswordCredentials != null) {
+                    httpclient.getCredentialsProvider().setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT), usernamePasswordCredentials);
+                }
             }
 
             httpclient.setCookieStore(getCookieStore());
 
             for (Cookie cookie : httpclient.getCookieStore().getCookies()) {
-                getLog().debug(cookie.getName() + " = "+cookie.getValue() );
+                getLog().debug(cookie.getName() + " = " + cookie.getValue());
             }
 
 
