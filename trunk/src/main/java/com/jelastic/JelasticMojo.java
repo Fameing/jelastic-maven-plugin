@@ -385,9 +385,9 @@ public abstract class JelasticMojo extends AbstractMojo {
             for (Cookie cookie : httpclient.getCookieStore().getCookies()) {
                 getLog().debug(cookie.getName() + " = " + cookie.getValue());
             }
-            final File file = new File(getOutputDirectory() + File.separator + getFinalName() + "." + project.getModel().getPackaging());
+            final File file = new File(getOutputDirectory() + File.separator + getFinalName() + "." + project.getArtifact().getArtifactHandler().getExtension());
             if (!file.exists()) {
-                throw new MojoExecutionException("First build artifact and try again. Artifact not found " + getFinalName() + "." + project.getModel().getPackaging());
+                throw new MojoExecutionException("First build artifact and try again. Artifact not found " + getFinalName() + "." + project.getArtifact().getArtifactHandler().getExtension());
             }
 
 
