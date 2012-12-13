@@ -467,6 +467,8 @@ public abstract class JelasticMojo extends AbstractMojo {
             } else {
                 local_comment = getFinalName() + "." + project.getModel().getPackaging();
             }
+            
+            local_comment = local_comment.replaceAll("\\n", "");
 
             List<NameValuePair> nameValuePairList = new ArrayList<NameValuePair>();
             nameValuePairList.add(new BasicNameValuePair("charset", "UTF-8"));
