@@ -8,12 +8,16 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
 /**
- * Goal which touches a timestamp file.
+ * Goal which publish artifact to Jelastic Cloud Platform
  *
  * @goal publish
  */
 public class PublishMojo extends JelasticMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
+        if (!isWar()) {
+            getLog().info("Skiping publish artifact. Artifact packaging not WAR or EAR");
+            return;
+        }
         Authentication authentication = authentication();
         if (authentication.getResult() == 0) {
             getLog().info("------------------------------------------------------------------------");

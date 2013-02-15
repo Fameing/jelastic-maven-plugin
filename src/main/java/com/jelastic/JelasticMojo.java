@@ -15,11 +15,9 @@ package com.jelastic;
  */
 
 import com.jelastic.model.*;
-import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CookieStore;
@@ -36,19 +34,21 @@ import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.message.AbstractHttpMessage;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Proxy;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -56,15 +56,11 @@ import javax.net.ssl.X509TrustManager;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.Map;
+import java.util.*;
 import java.net.URLDecoder;
 
 public abstract class JelasticMojo extends AbstractMojo {
@@ -82,6 +78,32 @@ public abstract class JelasticMojo extends AbstractMojo {
     private static ObjectMapper mapper = new ObjectMapper();
     private static Properties properties = new Properties();
 
+    /**
+     * Used to look up Artifacts in the remote repository.
+     *
+     * @parameter expression= "${component.org.apache.maven.artifact.resolver.ArtifactResolver}"
+     * @required
+     * @readonly
+     */
+    protected ArtifactResolver artifactResolver;
+
+    /**
+     * The package output file.
+     *
+     * @parameter default-value = "${project.build.directory}/${project.build.finalName}.${project.packaging}"
+     * @required
+     * @readonly
+     */
+    private File artifactFile;
+
+    /**
+     * The packaging of the Maven project that this goal operates upon.
+     *
+     * @parameter expression = "${project.packaging}"
+     * @required
+     * @readonly
+     */
+    private String packaging;
 
     /**
      * The maven project.
@@ -155,13 +177,6 @@ public abstract class JelasticMojo extends AbstractMojo {
     private String environment;
 
     /**
-     * War finalName Properties.
-     *
-     * @parameter expression="${project.build.finalName}" default-value="${project.build.finalName}"
-     */
-    private String finalName;
-
-    /**
      * Location of the file.
      *
      * @parameter expression="${project.build.directory}" default-value="${project.build.directory}"
@@ -169,8 +184,13 @@ public abstract class JelasticMojo extends AbstractMojo {
      */
     public File outputDirectory;
 
-    public String getFinalName() {
-        return finalName;
+    protected boolean isWar() {
+        if ("war".equals(packaging)) {
+            return true;
+        } else if ("ear".equals(packaging)) {
+            return true;
+        }
+        return false;
     }
 
     public File getOutputDirectory() {
@@ -385,9 +405,18 @@ public abstract class JelasticMojo extends AbstractMojo {
             for (Cookie cookie : httpclient.getCookieStore().getCookies()) {
                 getLog().debug(cookie.getName() + " = " + cookie.getValue());
             }
-            final File file = new File(getOutputDirectory() + File.separator + getFinalName() + "." + project.getArtifact().getArtifactHandler().getExtension());
-            if (!file.exists()) {
-                throw new MojoExecutionException("First build artifact and try again. Artifact not found " + getFinalName() + "." + project.getArtifact().getArtifactHandler().getExtension());
+            if (!artifactFile.exists()) {
+                String externalFileName = getWarNameFromWarPlugin();
+                if (externalFileName != null) {
+                    File extPlufinConfiguration = new File(outputDirectory + File.separator + getWarNameFromWarPlugin() + "." + packaging);
+                    if (!extPlufinConfiguration.exists()) {
+                        throw new MojoExecutionException("First build artifact and try again. Artifact not found " + extPlufinConfiguration.getName());
+                    }
+                    getLog().info("Found another configuration artifact name is " + extPlufinConfiguration.getName());
+                    artifactFile = new File(outputDirectory + File.separator + getWarNameFromWarPlugin() + "." + packaging);
+                } else {
+                    throw new MojoExecutionException("First build artifact and try again. Artifact not found " + artifactFile.getName());
+                }
             }
 
 
@@ -403,7 +432,7 @@ public abstract class JelasticMojo extends AbstractMojo {
 
             multipartEntity.addPart("fid", new StringBody("123456"));
             multipartEntity.addPart("session", new StringBody(authentication.getSession()));
-            multipartEntity.addPart("file", new FileBody(file));
+            multipartEntity.addPart("file", new FileBody(artifactFile));
             totalSize = multipartEntity.getContentLength();
 
             URI uri = URIUtils.createURI(getShema(), getApiJelastic(), getPort(), getUrlUploader(), null, null);
@@ -465,16 +494,16 @@ public abstract class JelasticMojo extends AbstractMojo {
             } else if (comment != null && !comment.isEmpty()) {
                 local_comment = comment;
             } else {
-                local_comment = getFinalName() + "." + project.getModel().getPackaging();
+                local_comment = project.getModel().getDescription();
             }
-            
+
             local_comment = local_comment.replaceAll("\\n", "");
 
             List<NameValuePair> nameValuePairList = new ArrayList<NameValuePair>();
             nameValuePairList.add(new BasicNameValuePair("charset", "UTF-8"));
             nameValuePairList.add(new BasicNameValuePair("session", authentication.getSession()));
             nameValuePairList.add(new BasicNameValuePair("type", "JDeploy"));
-            nameValuePairList.add(new BasicNameValuePair("data", "{'name':'" + getFinalName() + "." + project.getModel().getPackaging() + "', 'archive':'" + upLoader.getFile() + "', 'link':0, 'size':" + upLoader.getSize() + ", 'comment':'" + local_comment + "'}"));
+            nameValuePairList.add(new BasicNameValuePair("data", "{'name':'" + artifactFile.getName() + "', 'archive':'" + upLoader.getFile() + "', 'link':0, 'size':" + upLoader.getSize() + ", 'comment':'" + local_comment + "'}"));
 
             UrlEncodedFormEntity entity = new UrlEncodedFormEntity(nameValuePairList, "UTF-8");
 
@@ -657,5 +686,23 @@ public abstract class JelasticMojo extends AbstractMojo {
             ex.printStackTrace();
             return null;
         }
+    }
+
+
+    public String getWarNameFromWarPlugin() {
+        MavenProject mavenProject = ((MavenProject) getPluginContext().get("project"));
+        List<Plugin> plugins = mavenProject.getOriginalModel().getBuild().getPlugins();
+        for (Plugin plugin : plugins) {
+            if (plugin.getArtifactId().equals("maven-war-plugin")) {
+                Xpp3Dom xpp3Dom = (Xpp3Dom) plugin.getConfiguration();
+                Xpp3Dom[] xpp3Doms = xpp3Dom.getChildren();
+                for (Xpp3Dom dom : xpp3Doms) {
+                    if (dom.getName().equals("warName")) {
+                        return dom.getValue();
+                    }
+                }
+            }
+        }
+        return null;
     }
 }
