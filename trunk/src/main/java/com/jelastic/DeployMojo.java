@@ -5,7 +5,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
 /**
- * Goal which touches a timestamp file.
+ * Goal which deploy artifact to Jelastic Cloud Platform
  *
  * @goal deploy
  * @phase install
@@ -13,6 +13,10 @@ import org.apache.maven.plugin.MojoFailureException;
 public class DeployMojo extends JelasticMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
+        if (!isWar()) {
+            getLog().info("Skiping deploy artifact. Artifact packaging not WAR or EAR");
+            return;
+        }
         Authentication authentication = authentication();
         if (authentication.getResult() == 0) {
             getLog().info("------------------------------------------------------------------------");
