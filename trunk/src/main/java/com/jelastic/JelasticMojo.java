@@ -493,8 +493,10 @@ public abstract class JelasticMojo extends AbstractMojo {
                 local_comment = System.getProperty("jelastic-comment");
             } else if (comment != null && !comment.isEmpty()) {
                 local_comment = comment;
-            } else {
+            } else if (project.getModel().getDescription() != null) {
                 local_comment = project.getModel().getDescription();
+            } else {
+                local_comment = "";
             }
 
             local_comment = local_comment.replaceAll("\\n", "");
