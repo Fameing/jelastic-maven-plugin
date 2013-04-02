@@ -42,12 +42,14 @@ public class DeployMojo extends JelasticMojo {
                         getLog().info("      Deploy file : SUCCESS");
                         getLog().info("       Deploy log :");
                         getLog().info(deploy.getResponse().getResponses()[0].getOut());
-                        LogOut logOut = logOut(authentication);
-                        if (logOut.getResult() == 0) {
-                            getLog().info("           LogOut : SUCCESS");
-                        } else {
-                            getLog().info("LogOut : FAILED");
-                            getLog().error("Error : " + logOut.getError());
+                        if (System.getProperty("jelastic-session") == null) {
+                            LogOut logOut = logOut(authentication);
+                            if (logOut.getResult() == 0) {
+                                getLog().info("           LogOut : SUCCESS");
+                            } else {
+                                getLog().info("LogOut : FAILED");
+                                getLog().error("Error : " + logOut.getError());
+                            }
                         }
                     } else {
                         getLog().error("          Deploy : FAILED");

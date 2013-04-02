@@ -37,12 +37,14 @@ public class PublishMojo extends JelasticMojo {
                     getLog().info("  Registration ID : " + createObject.getResponse().getObject().getId());
                     getLog().info("     Developer ID : " + createObject.getResponse().getObject().getDeveloper());
                     getLog().info("------------------------------------------------------------------------");
-                    LogOut logOut = logOut(authentication);
-                    if (logOut.getResult() == 0){
-                        getLog().info("           LogOut : SUCCESS");
-                    } else {
-                        getLog().info("LogOut : FAILED");
-                        getLog().error("Error : " + logOut.getError());
+                    if (System.getProperty("jelastic-session") == null) {
+                        LogOut logOut = logOut(authentication);
+                        if (logOut.getResult() == 0){
+                            getLog().info("           LogOut : SUCCESS");
+                        } else {
+                            getLog().info("LogOut : FAILED");
+                            getLog().error("Error : " + logOut.getError());
+                        }
                     }
                 }
             } else {
