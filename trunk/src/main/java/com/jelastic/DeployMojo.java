@@ -49,20 +49,24 @@ public class DeployMojo extends JelasticMojo {
                             } else {
                                 getLog().info("LogOut : FAILED");
                                 getLog().error("Error : " + logOut.getError());
+                                throw new MojoExecutionException(logOut.getError());
                             }
                         }
                     } else {
                         getLog().error("          Deploy : FAILED");
                         getLog().error("           Error : " + deploy.getResponse().getError());
+                        throw new MojoExecutionException( deploy.getResponse().getError());
                     }
                 }
             } else {
                 getLog().error("File upload : FAILED");
                 getLog().error("      Error : " + upLoader.getError());
+                throw new MojoExecutionException(upLoader.getError());
             }
         } else {
             getLog().error("Authentication : FAILED");
             getLog().error("         Error : " + authentication.getError());
+            throw new MojoExecutionException(authentication.getError());
         }
 
 
