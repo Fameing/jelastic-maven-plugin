@@ -25,6 +25,8 @@ import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.params.ClientPNames;
+import org.apache.http.client.params.CookiePolicy;
 import org.apache.http.client.utils.URIUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.conn.ClientConnectionManager;
@@ -337,6 +339,7 @@ public abstract class JelasticMojo extends AbstractMojo {
             }
             try {
                 DefaultHttpClient httpclient = new DefaultHttpClient();
+                httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.BROWSER_COMPATIBILITY);
                 httpclient = wrapClient(httpclient);
                 if (http_proxy != null) {
                     httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
@@ -401,6 +404,7 @@ public abstract class JelasticMojo extends AbstractMojo {
                 }
             }
             httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
+            httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.BROWSER_COMPATIBILITY);
             httpclient.setCookieStore(getCookieStore());
             for (Cookie cookie : httpclient.getCookieStore().getCookies()) {
                 getLog().debug(cookie.getName() + " = " + cookie.getValue());
@@ -482,6 +486,7 @@ public abstract class JelasticMojo extends AbstractMojo {
                     httpclient.getCredentialsProvider().setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT), usernamePasswordCredentials);
                 }
             }
+            httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.BROWSER_COMPATIBILITY);
             httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
             httpclient.setCookieStore(getCookieStore());
             for (Cookie cookie : httpclient.getCookieStore().getCookies()) {
@@ -560,7 +565,7 @@ public abstract class JelasticMojo extends AbstractMojo {
                     httpclient.getCredentialsProvider().setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT), usernamePasswordCredentials);
                 }
             }
-
+            httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.BROWSER_COMPATIBILITY);
             httpclient.setCookieStore(getCookieStore());
 
             for (Cookie cookie : httpclient.getCookieStore().getCookies()) {
@@ -622,7 +627,7 @@ public abstract class JelasticMojo extends AbstractMojo {
                     httpclient.getCredentialsProvider().setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT), usernamePasswordCredentials);
                 }
             }
-
+            httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.BROWSER_COMPATIBILITY);
             httpclient.setCookieStore(getCookieStore());
 
             for (Cookie cookie : httpclient.getCookieStore().getCookies()) {
