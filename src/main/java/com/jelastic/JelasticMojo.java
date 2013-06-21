@@ -34,14 +34,16 @@ import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.cookie.Cookie;
+import org.apache.http.cookie.*;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.cookie.BrowserCompatSpec;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.message.AbstractHttpMessage;
+import org.apache.http.params.HttpParams;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
@@ -339,8 +341,19 @@ public abstract class JelasticMojo extends AbstractMojo {
             }
             try {
                 DefaultHttpClient httpclient = new DefaultHttpClient();
-                httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.BROWSER_COMPATIBILITY);
-                httpclient.getParams().setParameter("http.protocol.single-cookie-header", Boolean.TRUE);
+                CookieSpecFactory csf = new CookieSpecFactory() {
+                    public CookieSpec newInstance(HttpParams params) {
+                        return new BrowserCompatSpec() {
+                            @Override
+                            public void validate(Cookie cookie, CookieOrigin origin)
+                                    throws MalformedCookieException {
+                                // Oh, I am easy
+                            }
+                        };
+                    }
+                };
+                httpclient.getCookieSpecs().register("easy", csf);
+                httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY, "easy");
                 httpclient = wrapClient(httpclient);
                 if (http_proxy != null) {
                     httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
@@ -405,8 +418,19 @@ public abstract class JelasticMojo extends AbstractMojo {
                 }
             }
             httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
-            httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.BROWSER_COMPATIBILITY);
-            httpclient.getParams().setParameter("http.protocol.single-cookie-header", Boolean.TRUE);
+            CookieSpecFactory csf = new CookieSpecFactory() {
+                public CookieSpec newInstance(HttpParams params) {
+                    return new BrowserCompatSpec() {
+                        @Override
+                        public void validate(Cookie cookie, CookieOrigin origin)
+                                throws MalformedCookieException {
+                            // Oh, I am easy
+                        }
+                    };
+                }
+            };
+            httpclient.getCookieSpecs().register("easy", csf);
+            httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY, "easy");
             httpclient.setCookieStore(getCookieStore());
             for (Cookie cookie : httpclient.getCookieStore().getCookies()) {
                 getLog().debug(cookie.getName() + " = " + cookie.getValue());
@@ -488,8 +512,19 @@ public abstract class JelasticMojo extends AbstractMojo {
                     httpclient.getCredentialsProvider().setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT), usernamePasswordCredentials);
                 }
             }
-            httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.BROWSER_COMPATIBILITY);
-            httpclient.getParams().setParameter("http.protocol.single-cookie-header", Boolean.TRUE);
+            CookieSpecFactory csf = new CookieSpecFactory() {
+                public CookieSpec newInstance(HttpParams params) {
+                    return new BrowserCompatSpec() {
+                        @Override
+                        public void validate(Cookie cookie, CookieOrigin origin)
+                                throws MalformedCookieException {
+                            // Oh, I am easy
+                        }
+                    };
+                }
+            };
+            httpclient.getCookieSpecs().register("easy", csf);
+            httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY, "easy");
             httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
             httpclient.setCookieStore(getCookieStore());
             for (Cookie cookie : httpclient.getCookieStore().getCookies()) {
@@ -568,8 +603,19 @@ public abstract class JelasticMojo extends AbstractMojo {
                     httpclient.getCredentialsProvider().setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT), usernamePasswordCredentials);
                 }
             }
-            httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.BROWSER_COMPATIBILITY);
-            httpclient.getParams().setParameter("http.protocol.single-cookie-header", Boolean.TRUE);
+            CookieSpecFactory csf = new CookieSpecFactory() {
+                public CookieSpec newInstance(HttpParams params) {
+                    return new BrowserCompatSpec() {
+                        @Override
+                        public void validate(Cookie cookie, CookieOrigin origin)
+                                throws MalformedCookieException {
+                            // Oh, I am easy
+                        }
+                    };
+                }
+            };
+            httpclient.getCookieSpecs().register("easy", csf);
+            httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY, "easy");
             httpclient.setCookieStore(getCookieStore());
 
             for (Cookie cookie : httpclient.getCookieStore().getCookies()) {
