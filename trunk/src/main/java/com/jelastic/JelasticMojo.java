@@ -340,6 +340,7 @@ public abstract class JelasticMojo extends AbstractMojo {
             try {
                 DefaultHttpClient httpclient = new DefaultHttpClient();
                 httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.BROWSER_COMPATIBILITY);
+                httpclient.getParams().setParameter("http.protocol.single-cookie-header", Boolean.TRUE);
                 httpclient = wrapClient(httpclient);
                 if (http_proxy != null) {
                     httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
@@ -405,6 +406,7 @@ public abstract class JelasticMojo extends AbstractMojo {
             }
             httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
             httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.BROWSER_COMPATIBILITY);
+            httpclient.getParams().setParameter("http.protocol.single-cookie-header", Boolean.TRUE);
             httpclient.setCookieStore(getCookieStore());
             for (Cookie cookie : httpclient.getCookieStore().getCookies()) {
                 getLog().debug(cookie.getName() + " = " + cookie.getValue());
@@ -487,6 +489,7 @@ public abstract class JelasticMojo extends AbstractMojo {
                 }
             }
             httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.BROWSER_COMPATIBILITY);
+            httpclient.getParams().setParameter("http.protocol.single-cookie-header", Boolean.TRUE);
             httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
             httpclient.setCookieStore(getCookieStore());
             for (Cookie cookie : httpclient.getCookieStore().getCookies()) {
@@ -566,6 +569,7 @@ public abstract class JelasticMojo extends AbstractMojo {
                 }
             }
             httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.BROWSER_COMPATIBILITY);
+            httpclient.getParams().setParameter("http.protocol.single-cookie-header", Boolean.TRUE);
             httpclient.setCookieStore(getCookieStore());
 
             for (Cookie cookie : httpclient.getCookieStore().getCookies()) {
@@ -628,6 +632,7 @@ public abstract class JelasticMojo extends AbstractMojo {
                 }
             }
             httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.BROWSER_COMPATIBILITY);
+            httpclient.getParams().setParameter("http.protocol.single-cookie-header", Boolean.TRUE);
             httpclient.setCookieStore(getCookieStore());
 
             for (Cookie cookie : httpclient.getCookieStore().getCookies()) {
