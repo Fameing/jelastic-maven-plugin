@@ -341,7 +341,7 @@ public abstract class JelasticMojo extends AbstractMojo {
             }
             try {
                 DefaultHttpClient httpclient = new DefaultHttpClient();
-                CookieSpecFactory csf = new CookieSpecFactory() {
+/*                CookieSpecFactory csf = new CookieSpecFactory() {
                     public CookieSpec newInstance(HttpParams params) {
                         return new BrowserCompatSpec() {
                             @Override
@@ -353,7 +353,11 @@ public abstract class JelasticMojo extends AbstractMojo {
                     }
                 };
                 httpclient.getCookieSpecs().register("easy", csf);
-                httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY, "easy");
+                httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY, "easy");*/
+
+                httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.BROWSER_COMPATIBILITY);
+                httpclient.getParams().setParameter("http.protocol.single-cookie-header", Boolean.TRUE);
+
                 httpclient = wrapClient(httpclient);
                 if (http_proxy != null) {
                     httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
@@ -418,7 +422,7 @@ public abstract class JelasticMojo extends AbstractMojo {
                 }
             }
             httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
-            CookieSpecFactory csf = new CookieSpecFactory() {
+/*            CookieSpecFactory csf = new CookieSpecFactory() {
                 public CookieSpec newInstance(HttpParams params) {
                     return new BrowserCompatSpec() {
                         @Override
@@ -430,7 +434,10 @@ public abstract class JelasticMojo extends AbstractMojo {
                 }
             };
             httpclient.getCookieSpecs().register("easy", csf);
-            httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY, "easy");
+            httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY, "easy");*/
+
+            httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.BROWSER_COMPATIBILITY);
+            httpclient.getParams().setParameter("http.protocol.single-cookie-header", Boolean.TRUE);
             httpclient.setCookieStore(getCookieStore());
             for (Cookie cookie : httpclient.getCookieStore().getCookies()) {
                 getLog().debug(cookie.getName() + " = " + cookie.getValue());
@@ -512,7 +519,7 @@ public abstract class JelasticMojo extends AbstractMojo {
                     httpclient.getCredentialsProvider().setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT), usernamePasswordCredentials);
                 }
             }
-            CookieSpecFactory csf = new CookieSpecFactory() {
+/*            CookieSpecFactory csf = new CookieSpecFactory() {
                 public CookieSpec newInstance(HttpParams params) {
                     return new BrowserCompatSpec() {
                         @Override
@@ -524,8 +531,11 @@ public abstract class JelasticMojo extends AbstractMojo {
                 }
             };
             httpclient.getCookieSpecs().register("easy", csf);
-            httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY, "easy");
+            httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY, "easy");*/
             httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, http_proxy);
+
+            httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.BROWSER_COMPATIBILITY);
+            httpclient.getParams().setParameter("http.protocol.single-cookie-header", Boolean.TRUE);
             httpclient.setCookieStore(getCookieStore());
             for (Cookie cookie : httpclient.getCookieStore().getCookies()) {
                 getLog().debug(cookie.getName() + " = " + cookie.getValue());
@@ -603,7 +613,7 @@ public abstract class JelasticMojo extends AbstractMojo {
                     httpclient.getCredentialsProvider().setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT), usernamePasswordCredentials);
                 }
             }
-            CookieSpecFactory csf = new CookieSpecFactory() {
+/*            CookieSpecFactory csf = new CookieSpecFactory() {
                 public CookieSpec newInstance(HttpParams params) {
                     return new BrowserCompatSpec() {
                         @Override
@@ -615,7 +625,9 @@ public abstract class JelasticMojo extends AbstractMojo {
                 }
             };
             httpclient.getCookieSpecs().register("easy", csf);
-            httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY, "easy");
+            httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY, "easy");*/
+            httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.BROWSER_COMPATIBILITY);
+            httpclient.getParams().setParameter("http.protocol.single-cookie-header", Boolean.TRUE);
             httpclient.setCookieStore(getCookieStore());
 
             for (Cookie cookie : httpclient.getCookieStore().getCookies()) {
