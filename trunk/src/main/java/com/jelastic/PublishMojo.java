@@ -14,6 +14,10 @@ import org.apache.maven.plugin.MojoFailureException;
  */
 public class PublishMojo extends JelasticMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
+        if(isSkip()) {
+            getLog().info("Skiping publish artifact.");
+            return;
+        }
         if (!isWar()) {
             getLog().info("Skiping publish artifact. Artifact packaging not WAR or EAR");
             return;
