@@ -13,6 +13,10 @@ import org.apache.maven.plugin.MojoFailureException;
 public class DeployMojo extends JelasticMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
+        if(isSkip()) {
+            getLog().info("Skiping deploy artifact.");
+            return;
+        }
         if (!isWar()) {
             getLog().info("Skiping deploy artifact. Artifact packaging not WAR or EAR");
             return;

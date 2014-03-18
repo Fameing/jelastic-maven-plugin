@@ -164,6 +164,12 @@ public abstract class JelasticMojo extends AbstractMojo {
      */
     private String context;
 
+    /**
+     * Context Properties.
+     *
+     * @parameter default-value="false"
+     */
+    private boolean skip;
 
     /**
      * Context Properties.
@@ -238,6 +244,14 @@ public abstract class JelasticMojo extends AbstractMojo {
 
     public String getUrlLogOut() {
         return urlLogOut;
+    }
+
+    public boolean isSkip() {
+        return skip;
+    }
+
+    public void setSkip(boolean skip) {
+        this.skip = skip;
     }
 
     public String getEmail() {
